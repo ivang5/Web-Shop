@@ -1,8 +1,15 @@
 package com.ivang.webshop;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import com.ivang.webshop.dto.AdminDTO;
+import com.ivang.webshop.dto.BuyerDTO;
 import com.ivang.webshop.entity.Admin;
+import com.ivang.webshop.entity.Buyer;
+import com.ivang.webshop.entity.Order;
 import com.ivang.webshop.service.AdminService;
+import com.ivang.webshop.service.BuyerService;
 
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
@@ -33,6 +40,16 @@ public class WebshopApplication {
 			adminService.save(new AdminDTO(admin1));
 			adminService.save(new AdminDTO(admin2));
 			adminService.save(new AdminDTO(admin3));
+		};
+	}
+
+	@Bean
+	CommandLineRunner runAgain (BuyerService buyerService) {
+		List<Order> orders = new ArrayList<Order>();
+		Buyer buyer1 = new Buyer(null, "John", "Cena", "john", "12345", false, "2125 Chestnut Street", orders);
+
+		return args -> {
+			buyerService.save(new BuyerDTO(buyer1));
 		};
 	}
 

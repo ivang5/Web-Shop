@@ -10,11 +10,13 @@ import com.ivang.webshop.dto.AdminDTO;
 import com.ivang.webshop.entity.Admin;
 import com.ivang.webshop.repository.AdminRepository;
 
+import org.springframework.context.annotation.Primary;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import lombok.RequiredArgsConstructor;
@@ -24,9 +26,11 @@ import lombok.extern.log4j.Log4j2;
 @Transactional
 @RequiredArgsConstructor
 @Log4j2
+@Primary
 public class AdminService implements AdminServiceInterface, UserDetailsService {
 
     private final AdminRepository adminRepository;
+    private final PasswordEncoder passwordEncoder;
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
@@ -96,7 +100,7 @@ public class AdminService implements AdminServiceInterface, UserDetailsService {
         admin.setFirstName(adminDTO.getFirstName());
         admin.setLastName(adminDTO.getLastName());
         admin.setUsername(adminDTO.getUsername());
-        admin.setPassword(adminDTO.getPassword());
+        admin.setPassword(passwordEncoder.encode(adminDTO.getPassword()));
         admin.setBlocked(adminDTO.isBlocked());
         
         adminRepository.save(admin);

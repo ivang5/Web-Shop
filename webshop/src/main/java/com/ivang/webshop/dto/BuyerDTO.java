@@ -22,7 +22,7 @@ public class BuyerDTO extends UserDTO {
     }
 
     public BuyerDTO(Buyer buyer) {
-        super();
+        super(buyer);
         this.address = buyer.getAddress();
         ArrayList<OrderDTO> orders = new ArrayList<OrderDTO>();
         for (Order order : buyer.getOrders()) {

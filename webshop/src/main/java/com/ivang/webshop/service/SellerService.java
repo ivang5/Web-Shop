@@ -15,6 +15,7 @@ import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import lombok.RequiredArgsConstructor;
@@ -27,6 +28,7 @@ import lombok.extern.log4j.Log4j2;
 public class SellerService implements SellerServiceInterface, UserDetailsService {
     
     private final SellerRepository sellerRepository;
+    private final PasswordEncoder passwordEncoder;
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
@@ -96,7 +98,7 @@ public class SellerService implements SellerServiceInterface, UserDetailsService
         seller.setFirstName(sellerDTO.getFirstName());
         seller.setLastName(sellerDTO.getLastName());
         seller.setUsername(sellerDTO.getUsername());
-        seller.setPassword(sellerDTO.getPassword());
+        seller.setPassword(passwordEncoder.encode(sellerDTO.getPassword()));
         seller.setBlocked(sellerDTO.isBlocked());
         seller.setOperatesFrom(sellerDTO.getOperatesFrom());
         seller.setEmail(sellerDTO.getEmail());

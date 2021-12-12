@@ -31,7 +31,7 @@ public class SellerDTO extends UserDTO {
     }
 
     public SellerDTO(Seller seller) {
-        super();
+        super(seller);
         this.operatesFrom = seller.getOperatesFrom();
         this.email = seller.getEmail();
         this.address = seller.getAddress();
