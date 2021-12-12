@@ -40,7 +40,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         http.sessionManagement().sessionCreationPolicy(STATELESS);
         // Ovo znaci da svako moze pristupiti /login putanji
         // To mora stojati na vrhu, iznad drugih antMatchers metoda koje dozvoljavaju pristup samo nekim rolama
-        http.authorizeRequests().antMatchers("/shop/login/**").permitAll();
+        http.authorizeRequests().antMatchers("/shop/login/**", "/shop/users/token/refresh/**").permitAll();
         http.authorizeRequests().antMatchers(GET, "/shop/users/**").hasAnyAuthority("admin");
         http.authorizeRequests().anyRequest().authenticated();
         http.addFilter(customAuthenticationFilter);
