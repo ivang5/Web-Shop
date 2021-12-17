@@ -25,8 +25,6 @@ public class Seller extends User {
 
     @OneToMany(cascade = { CascadeType.ALL }, fetch = LAZY, mappedBy = "seller")
     private List<Sale> sales = new ArrayList<Sale>();
-    
-    // public Seller() {}
 
     public Seller(Long id, String firstName, String lastName, String username, String password, boolean blocked, Date operatesFrom,
             String email, String address, String name, List<Product> products, List<Sale> sales) {

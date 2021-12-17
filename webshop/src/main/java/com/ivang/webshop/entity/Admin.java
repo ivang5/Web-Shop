@@ -9,8 +9,6 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class Admin extends User {
 
-    // public Admin() {}
-
     public Admin(Long id, String firstName, String lastName, String username, String password, boolean blocked) {
         super(id, firstName, lastName, username, password, blocked);
     }

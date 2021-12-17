@@ -41,21 +41,6 @@ public class Product implements Serializable {
     @JoinColumn(name = "seller_id", referencedColumnName = "id", nullable = false)
     private Seller seller;
 
-    // public Product() {}
-
-    // public Product(Long id, String name, String description, double price, ProductType productType, String picturePath,
-    //         List<Item> items, List<Sale> sales, Seller seller) {
-    //     this.id = id;
-    //     this.name = name;
-    //     this.description = description;
-    //     this.price = price;
-    //     this.productType = productType;
-    //     this.picturePath = picturePath;
-    //     this.items = items;
-    //     this.sales = sales;
-    //     this.seller = seller;
-    // }
-
     public Long getId() {
         return id;
     }

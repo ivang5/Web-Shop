@@ -30,15 +30,6 @@ public class Item implements Serializable {
     @JoinColumn(name = "order_id", referencedColumnName = "id", nullable = false)
     private Order order;
 
-    // public Item() {}
-
-    // public Item(Long id, Integer quantity, Product product, Order order) {
-    //     this.id = id;
-    //     this.quantity = quantity;
-    //     this.product = product;
-    //     this.order = order;
-    // }
-
     public Long getId() {
         return id;
     }

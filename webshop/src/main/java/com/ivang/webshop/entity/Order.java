@@ -39,21 +39,6 @@ public class Order implements Serializable {
     @OneToMany(cascade = { CascadeType.ALL }, fetch = EAGER, mappedBy = "order")
     private List<Item> items = new ArrayList<Item>();
 
-    // public Order() {}
-
-    // public Order(Long id, Date time, boolean delivered, Integer rate, String comment, Boolean anonymousComment,
-    //         boolean archivedComment, Buyer buyer, List<Item> items) {
-    //     this.id = id;
-    //     this.time = time;
-    //     this.delivered = delivered;
-    //     this.rate = rate;
-    //     this.comment = comment;
-    //     this.anonymousComment = anonymousComment;
-    //     this.archivedComment = archivedComment;
-    //     this.buyer = buyer;
-    //     this.items = items;
-    // }
-
     public Long getId() {
         return id;
     }

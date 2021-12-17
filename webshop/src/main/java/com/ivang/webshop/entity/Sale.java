@@ -36,18 +36,6 @@ public class Sale implements Serializable {
     @JoinTable(name = "product_sale", joinColumns = @JoinColumn(name = "sale_id"), inverseJoinColumns = @JoinColumn(name = "product_id"))
     private List<Product> products = new ArrayList<Product>();
 
-    // public Sale() {}
-
-    // public Sale(Long id, Integer percentage, Date fromDate, Date toDate, String text, Seller seller, List<Product> products) {
-    //     this.id = id;
-    //     this.percentage = percentage;
-    //     this.fromDate = fromDate;
-    //     this.toDate = toDate;
-    //     this.text = text;
-    //     this.seller = seller;
-    //     this.products = products;
-    // }
-
     public Long getId() {
         return id;
     }

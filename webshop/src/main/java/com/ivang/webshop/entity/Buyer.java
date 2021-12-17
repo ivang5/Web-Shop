@@ -19,8 +19,6 @@ public class Buyer extends User {
     @OneToMany(cascade = { CascadeType.ALL }, fetch = EAGER, mappedBy = "buyer")
     private List<Order> orders = new ArrayList<Order>();
 
-    // public Buyer() {}
-
     public Buyer(Long id, String firstName, String lastName, String username, String password, boolean blocked, String address,
             List<Order> orders) {
         super(id, firstName, lastName, username, password, blocked);

@@ -31,6 +31,7 @@ public class AdminService implements AdminServiceInterface, UserDetailsService {
 
     private final AdminRepository adminRepository;
     private final PasswordEncoder passwordEncoder;
+    private final BuyerService buyerService;
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
@@ -38,11 +39,11 @@ public class AdminService implements AdminServiceInterface, UserDetailsService {
 
         if (admin == null) {
             log.info("Admin {} not found in the database", username);
-            throw new UsernameNotFoundException("Admin not found in the database");
+            return buyerService.loadUserByUsername(username);
         } else {
             log.info("Admin {} found in the database", username);
         }
-
+        
         Collection<SimpleGrantedAuthority> authorities = new ArrayList<>();
         authorities.add(new SimpleGrantedAuthority("admin"));
 

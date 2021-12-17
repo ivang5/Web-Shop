@@ -7,19 +7,14 @@ import static org.springframework.http.HttpStatus.FORBIDDEN;
 import java.io.IOException;
 import java.net.URI;
 import java.util.Arrays;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import com.auth0.jwt.JWT;
-import com.auth0.jwt.JWTVerifier;
 import com.auth0.jwt.algorithms.Algorithm;
-import com.auth0.jwt.interfaces.DecodedJWT;
 import com.fasterxml.jackson.core.JsonGenerationException;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -32,6 +27,7 @@ import com.ivang.webshop.entity.Seller;
 import com.ivang.webshop.service.AdminServiceInterface;
 import com.ivang.webshop.service.BuyerServiceInterface;
 import com.ivang.webshop.service.SellerServiceInterface;
+import com.ivang.webshop.utility.SecurityHelper;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -60,19 +56,16 @@ public class UserController {
 
     @GetMapping(value = "/admin")
     public ResponseEntity<List<AdminDTO>> getAllAdmins() {
-        // return new ResponseEntity<List<AdminDTO>>(adminService.findAll(), HttpStatus.OK);
         return ResponseEntity.ok().body(adminService.findAll());
     }
 
     @GetMapping(value = "/buyer")
     public ResponseEntity<List<BuyerDTO>> getAllBuyers() {
-        // return new ResponseEntity<List<BuyerDTO>>(buyerService.findAll(), HttpStatus.OK);
         return ResponseEntity.ok().body(buyerService.findAll());
     }
 
     @GetMapping(value = "/seller")
     public ResponseEntity<List<SellerDTO>> getAllSellers() {
-        // return new ResponseEntity<List<SellerDTO>>(sellerService.findAll(), HttpStatus.OK);
         return ResponseEntity.ok().body(sellerService.findAll());
     }
 
@@ -81,11 +74,9 @@ public class UserController {
         Admin admin = adminService.findOne(id);
 
         if (admin == null) {
-            // return new ResponseEntity<AdminDTO>(HttpStatus.NOT_FOUND);
             return ResponseEntity.notFound().build();
         }
 
-        // return new ResponseEntity<AdminDTO>(new AdminDTO(admin), HttpStatus.OK);
         return ResponseEntity.ok().body(new AdminDTO(admin));
     }
 
@@ -94,11 +85,9 @@ public class UserController {
         Buyer buyer = buyerService.findOne(id);
 
         if (buyer == null) {
-            // return new ResponseEntity<BuyerDTO>(HttpStatus.NOT_FOUND);
             return ResponseEntity.notFound().build();
         }
 
-        // return new ResponseEntity<BuyerDTO>(new BuyerDTO(buyer), HttpStatus.OK);
         return ResponseEntity.ok().body(new BuyerDTO(buyer));
     }
 
@@ -107,38 +96,32 @@ public class UserController {
         Seller seller = sellerService.findOne(id);
 
         if (seller == null) {
-            // return new ResponseEntity<SellerDTO>(HttpStatus.NOT_FOUND);
             return ResponseEntity.notFound().build();
         }
 
-        // return new ResponseEntity<SellerDTO>(new SellerDTO(seller), HttpStatus.OK);
         return ResponseEntity.ok().body(new SellerDTO(seller));
     }
 
-    // @PostMapping(value = "/admin")
-    // public ResponseEntity<?> createAdmin(@RequestBody AdminDTO admin) {
-    //     try {
-    //         adminService.save(admin);
-    //     } catch (Exception e) {
-    //         // return new ResponseEntity<String>("Bad request, something went wrong", HttpStatus.BAD_REQUEST);
-    //         return ResponseEntity.badRequest().body("Bad request, something went wrong");
-    //     }
+    @PostMapping(value = "/admin")
+    public ResponseEntity<?> createAdmin(@RequestBody AdminDTO admin) {
+        try {
+            adminService.save(admin);
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body("Bad request, something went wrong");
+        }
 
-    //     // return new ResponseEntity<>(HttpStatus.CREATED);
-    //     URI uri = URI.create(ServletUriComponentsBuilder.fromCurrentContextPath().path("/shop/users/admin").toUriString());
-    //     return ResponseEntity.created(uri).build();
-    // }
+        URI uri = URI.create(ServletUriComponentsBuilder.fromCurrentContextPath().path("/shop/users/admin").toUriString());
+        return ResponseEntity.created(uri).build();
+    }
 
     @PostMapping(value = "/buyer")
     public ResponseEntity<?> createBuyer(@RequestBody BuyerDTO buyer) {
         try {
             buyerService.save(buyer);
         } catch (Exception e) {
-            // return new ResponseEntity<String>("Bad request, something went wrong", HttpStatus.BAD_REQUEST);
             return ResponseEntity.badRequest().body("Bad request, something went wrong");
         }
 
-        // return new ResponseEntity<>(HttpStatus.CREATED);
         URI uri = URI.create(ServletUriComponentsBuilder.fromCurrentContextPath().path("/shop/users/buyer").toUriString());
         return ResponseEntity.created(uri).build();
     }
@@ -148,11 +131,9 @@ public class UserController {
         try {
             sellerService.save(seller);
         } catch (Exception e) {
-            // return new ResponseEntity<String>("Bad request, something went wrong", HttpStatus.BAD_REQUEST);
             return ResponseEntity.badRequest().body("Bad request, something went wrong");
         }
 
-        // return new ResponseEntity<>(HttpStatus.CREATED);
         URI uri = URI.create(ServletUriComponentsBuilder.fromCurrentContextPath().path("/shop/users/seller").toUriString());
         return ResponseEntity.created(uri).build();
     }
@@ -165,7 +146,6 @@ public class UserController {
             return new ResponseEntity<String>("Bad request, something went wrong", HttpStatus.BAD_REQUEST);
         }
 
-        // return new ResponseEntity<>(HttpStatus.OK);
         return ResponseEntity.ok().build();
     }
 
@@ -177,7 +157,6 @@ public class UserController {
             return new ResponseEntity<String>("Bad request, something went wrong", HttpStatus.BAD_REQUEST);
         }
 
-        // return new ResponseEntity<>(HttpStatus.OK);
         return ResponseEntity.ok().build();
     }
 
@@ -189,7 +168,6 @@ public class UserController {
             return new ResponseEntity<String>("Bad request, something went wrong", HttpStatus.BAD_REQUEST);
         }
 
-        // return new ResponseEntity<>(HttpStatus.OK);
         return ResponseEntity.ok().build();
     }
 
@@ -199,11 +177,9 @@ public class UserController {
 
         if (admin != null) {
             adminService.remove(id);
-            // return new ResponseEntity<>(HttpStatus.OK);
             return ResponseEntity.ok().build();
         }
 
-        // return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         return ResponseEntity.notFound().build();
     }
 
@@ -213,11 +189,9 @@ public class UserController {
 
         if (buyer != null) {
             buyerService.remove(id);
-            // return new ResponseEntity<>(HttpStatus.OK);
             return ResponseEntity.ok().build();
         }
 
-        // return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         return ResponseEntity.notFound().build();
     }
 
@@ -227,48 +201,54 @@ public class UserController {
 
         if (seller != null) {
             sellerService.remove(id);
-            // return new ResponseEntity<>(HttpStatus.OK);
             return ResponseEntity.ok().build();
         }
 
-        // return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         return ResponseEntity.notFound().build();
     }
 
-    @GetMapping("/token/refresh/admin")
-    public void refreshTokenAdmin(HttpServletRequest request, HttpServletResponse response) throws JsonGenerationException, JsonMappingException, IOException {
+    @GetMapping(value = "/token/refresh")
+    public void refreshToken(HttpServletRequest request, HttpServletResponse response) throws JsonGenerationException, JsonMappingException, IOException {
         String authorizationHeader = request.getHeader(AUTHORIZATION);
+
         if (authorizationHeader != null && authorizationHeader.startsWith("Bearer ")) {
-                try {
-                    String refresh_token = authorizationHeader.substring("Bearer ".length());
-                    Algorithm algorithm = Algorithm.HMAC256("secret".getBytes());
-                    JWTVerifier verifier = JWT.require(algorithm).build();
-                    DecodedJWT decodedJWT = verifier.verify(refresh_token);
-                    String username = decodedJWT.getSubject();
-                    Admin admin = adminService.findByUsername(username);
-                    List<String> authorities = Arrays.asList("admin");
-                    String access_token = JWT.create()
-                        .withSubject(admin.getUsername())
-                        .withExpiresAt(new Date(System.currentTimeMillis() + 10 * 60 * 1000))
-                        .withIssuer(request.getRequestURL().toString())
-                        .withClaim("roles", authorities.stream().map(str -> str).collect(Collectors.toList()))
-                        .sign(algorithm);
-                    Map<String, String> tokens = new HashMap<>();
-                    tokens.put("access_token", access_token);
-                    tokens.put("refresh_token", refresh_token);
-                    response.setContentType(APPLICATION_JSON_VALUE);
-                    new ObjectMapper().writeValue(response.getOutputStream(), tokens);
-                } catch (Exception exception) {
-                    log.error("Error validating refresh token: {}", exception.getMessage());
-                    response.setHeader("error", exception.getMessage());
-                    response.setStatus(FORBIDDEN.value());
-                    Map<String, String> error = new HashMap<>();
-                    error.put("error_message", exception.getMessage());
-                    response.setContentType(APPLICATION_JSON_VALUE);
-                    new ObjectMapper().writeValue(response.getOutputStream(), error);
-                }
-            } else {
-                throw new RuntimeException("Refresh token is missing");
+            try {
+                String refresh_token_old = authorizationHeader.substring("Bearer ".length());
+                Algorithm algorithm = Algorithm.HMAC256("secret".getBytes());
+                String username = SecurityHelper.getUsernameFromJWT(refresh_token_old, algorithm);
+                List<String> authorities = getAuthorities(username);
+                Map<String, String> tokens = SecurityHelper.getTokens(request, username, authorities, algorithm);
+                response.setContentType(APPLICATION_JSON_VALUE);
+                new ObjectMapper().writeValue(response.getOutputStream(), tokens);
+            } catch (Exception exception) {
+                log.error("Error validating refresh token: {}", exception.getMessage());
+                response.setHeader("error", exception.getMessage());
+                response.setStatus(FORBIDDEN.value());
+                Map<String, String> error = new HashMap<>();
+                error.put("error_message", exception.getMessage());
+                response.setContentType(APPLICATION_JSON_VALUE);
+                new ObjectMapper().writeValue(response.getOutputStream(), error);
             }
+        } else {
+            throw new RuntimeException("Refresh token is missing");
+        }
+    }
+
+    public List<String> getAuthorities(String username) {
+        Admin admin = adminService.findByUsername(username);
+        Buyer buyer = buyerService.findByUsername(username);
+        String role;
+
+        if (admin != null) {
+            role = "admin";
+        } else if (buyer != null) {
+            role = "buyer";
+        } else {
+            role = "seller";
+        }
+
+        List<String> authorities = Arrays.asList(role);
+
+        return authorities;
     }
 }

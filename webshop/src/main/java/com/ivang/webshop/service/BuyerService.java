@@ -29,6 +29,7 @@ public class BuyerService implements BuyerServiceInterface, UserDetailsService {
     
     private final BuyerRepository buyerRepository;
     private final PasswordEncoder passwordEncoder;
+    private final SellerService sellerService;
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
@@ -36,7 +37,7 @@ public class BuyerService implements BuyerServiceInterface, UserDetailsService {
 
         if (buyer == null) {
             log.info("Buyer {} not found in the database", username);
-            throw new UsernameNotFoundException("Buyer not found in the database");
+            return sellerService.loadUserByUsername(username);
         } else {
             log.info("Buyer {} found in the database", username);
         }
