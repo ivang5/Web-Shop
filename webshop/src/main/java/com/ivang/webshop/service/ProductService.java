@@ -29,16 +29,28 @@ public class ProductService implements ProductServiceInterface {
         log.info("Fetching product {}", id);
         return productRepository.getById(id);
     }
-    
+
     @Override
     public List<ProductDTO> findAll() {
         log.info("Fetching all products");
         List<ProductDTO> productsDTO = new ArrayList<ProductDTO>();
-
+        
         for(Product p : productRepository.findAll()) {
             productsDTO.add(new ProductDTO(p));
         }
         
+        return productsDTO;
+    }
+    
+    @Override
+    public List<ProductDTO> findBySale(Long id) {
+        log.info("Fetching all products with sale {}", id);
+        List<ProductDTO> productsDTO = new ArrayList<ProductDTO>();
+
+        for(Product p : productRepository.findBySale(id)) {
+            productsDTO.add(new ProductDTO(p));
+        }
+
         return productsDTO;
     }
 

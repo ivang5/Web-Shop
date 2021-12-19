@@ -4,6 +4,7 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+
 import static javax.persistence.GenerationType.IDENTITY;
 
 import javax.persistence.*;
@@ -32,8 +33,7 @@ public class Sale implements Serializable {
     @JoinColumn(name = "seller_id", referencedColumnName = "id", nullable = false)
     private Seller seller;
 
-    @ManyToMany
-    @JoinTable(name = "product_sale", joinColumns = @JoinColumn(name = "sale_id"), inverseJoinColumns = @JoinColumn(name = "product_id"))
+    @ManyToMany(cascade = { CascadeType.ALL }, mappedBy = "sales")
     private List<Product> products = new ArrayList<Product>();
 
     public Long getId() {

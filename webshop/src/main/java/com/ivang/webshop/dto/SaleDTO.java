@@ -5,7 +5,6 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-import com.ivang.webshop.entity.Product;
 import com.ivang.webshop.entity.Sale;
 
 public class SaleDTO implements Serializable {
@@ -40,11 +39,6 @@ public class SaleDTO implements Serializable {
         this.toDate = sale.getToDate();
         this.text = sale.getText();
         this.seller = new SellerDTO(sale.getSeller());
-        List<ProductDTO> products = new ArrayList<ProductDTO>();
-        for (Product prodcut : sale.getProducts()) {
-            products.add(new ProductDTO(prodcut));
-        }
-        this.products = products;
     }
 
     public Long getId() {

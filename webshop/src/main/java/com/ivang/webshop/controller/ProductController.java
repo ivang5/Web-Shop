@@ -42,6 +42,11 @@ public class ProductController {
 		return new ResponseEntity<ProductDTO>(new ProductDTO(product), HttpStatus.OK);
 	}
 
+    @GetMapping(value = "/sale/{id}")
+    public ResponseEntity<List<ProductDTO>> getProductBySale(@PathVariable("id") Long id) {
+		return new ResponseEntity<List<ProductDTO>>(productService.findBySale(id), HttpStatus.OK);
+	}
+
     @PostMapping
     public ResponseEntity<?> createProduct(@RequestBody ProductDTO product) {
         try {

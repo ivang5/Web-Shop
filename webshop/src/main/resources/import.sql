@@ -24,7 +24,12 @@ INSERT INTO products (name, description, price, product_type, picture_path, sell
 INSERT INTO sales (percentage, from_date, to_date, text, seller_id) VALUES (30, "2021-10-20 12:00:00.000000", "2022-10-20 12:00:00.000000", "godisnje snizenje", 1)
 INSERT INTO sales (percentage, from_date, to_date, text, seller_id) VALUES (20, "2021-12-25 12:00:00.000000", "2022-02-25 12:00:00.000000", "zimsko snizenje", 3)
 
+INSERT INTO product_sale (product_id, sale_id) VALUES (1, 1)
+INSERT INTO product_sale (product_id, sale_id) VALUES (2, 1)
 INSERT INTO product_sale (product_id, sale_id) VALUES (3, 1)
 INSERT INTO product_sale (product_id, sale_id) VALUES (4, 1)
+INSERT INTO product_sale (product_id, sale_id) VALUES (5, 1)
 INSERT INTO product_sale (product_id, sale_id) VALUES (6, 1)
 INSERT INTO product_sale (product_id, sale_id) VALUES (8, 2)
+INSERT INTO product_sale (product_id, sale_id) VALUES (9, 2)
+INSERT INTO product_sale (product_id, sale_id) VALUES (10, 2)

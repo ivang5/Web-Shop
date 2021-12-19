@@ -57,6 +57,18 @@ public class SaleService implements SaleServiceInterface {
     }
 
     @Override
+    public List<SaleDTO> findByProduct(Long id) {
+        log.info("Fetching all sales with product {}", id);
+        List<SaleDTO> salesDTO = new ArrayList<SaleDTO>();
+
+        for(Sale p : saleRepository.findByProduct(id)) {
+            salesDTO.add(new SaleDTO(p));
+        }
+
+        return salesDTO;
+    }
+
+    @Override
     public void save(SaleDTO saleDTO) {
         log.info("Saving new sale {} to the database", saleDTO.getId());
         Sale sale = new Sale();

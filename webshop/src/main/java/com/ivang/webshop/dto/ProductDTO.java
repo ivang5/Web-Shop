@@ -4,7 +4,6 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.ivang.webshop.entity.Item;
 import com.ivang.webshop.entity.Product;
 import com.ivang.webshop.entity.ProductType;
 import com.ivang.webshop.entity.Sale;
@@ -45,10 +44,6 @@ public class ProductDTO implements Serializable {
         this.price = product.getPrice();
         this.productType = product.getProductType();
         this.picturePath = product.getPicturePath();
-        List<ItemDTO> items = new ArrayList<ItemDTO>();
-        for (Item item : product.getItems()) {
-            items.add(new ItemDTO(item));
-        }
         List<SaleDTO> sales = new ArrayList<SaleDTO>();
         for (Sale sale : product.getSales()) {
             sales.add(new SaleDTO(sale));

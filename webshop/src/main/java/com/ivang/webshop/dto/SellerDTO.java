@@ -3,8 +3,6 @@ package com.ivang.webshop.dto;
 import java.util.ArrayList;
 import java.util.Date;
 
-import com.ivang.webshop.entity.Product;
-import com.ivang.webshop.entity.Sale;
 import com.ivang.webshop.entity.Seller;
 
 public class SellerDTO extends UserDTO {
@@ -36,14 +34,6 @@ public class SellerDTO extends UserDTO {
         this.email = seller.getEmail();
         this.address = seller.getAddress();
         this.name = seller.getName();
-        ArrayList<SaleDTO> sales = new ArrayList<SaleDTO>();
-        for (Sale sale : seller.getSales()) {
-            sales.add(new SaleDTO(sale));
-        }
-        ArrayList<ProductDTO> products = new ArrayList<ProductDTO>();
-        for (Product product : seller.getProducts()) {
-            products.add(new ProductDTO(product));
-        }
     }
 
     public Date getOperatesFrom() {

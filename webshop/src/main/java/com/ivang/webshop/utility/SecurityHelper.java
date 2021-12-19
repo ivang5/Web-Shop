@@ -47,7 +47,7 @@ public class SecurityHelper {
     public static Map<String, String> getTokens(HttpServletRequest request, String username, List<String> authorities, Algorithm algorithm) {
         String access_token = JWT.create()
             .withSubject(username)
-            .withExpiresAt(new Date(System.currentTimeMillis() + 1 * 60 * 1000))
+            .withExpiresAt(new Date(System.currentTimeMillis() + 15 * 60 * 1000))
             .withIssuer(request.getRequestURL().toString())
             .withClaim("roles", authorities)
             .sign(algorithm);

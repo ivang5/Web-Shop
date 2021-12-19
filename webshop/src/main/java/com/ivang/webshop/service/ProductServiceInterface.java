@@ -9,6 +9,7 @@ public interface ProductServiceInterface {
     
     public Product findOne(Long id);
     public List<ProductDTO> findAll();
+    public List<ProductDTO> findBySale(Long id);
     public void save(ProductDTO product);
     public void update(ProductDTO product);
     public void remove(Long id);
