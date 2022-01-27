@@ -37,8 +37,18 @@ public class CustomAuthenticationFilter extends UsernamePasswordAuthenticationFi
     @Override
     public Authentication attemptAuthentication(HttpServletRequest request, HttpServletResponse response)
             throws AuthenticationException {
-        String username = request.getParameter("username");
-        String password = request.getParameter("password");
+        String requestString = "";
+        String username = "";
+        String password = "";
+
+        try {
+            requestString = request.getReader().readLine();
+            username = getTruncatedString(requestString, 3, 4);
+            password = getTruncatedString(requestString, 7, 8);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
         log.info("Username is: {}", username);
         log.info("Password is: {}", password);
         UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(username, password);
@@ -55,5 +65,30 @@ public class CustomAuthenticationFilter extends UsernamePasswordAuthenticationFi
         Map<String, String> tokens = SecurityHelper.getTokens(request, user.getUsername(), authorities, algorithm);
         response.setContentType(APPLICATION_JSON_VALUE);
         new ObjectMapper().writeValue(response.getOutputStream(), tokens);
+    }
+
+    private String getTruncatedString(String text, int startQuote, int endQuote) {
+        int counter = 0;
+        int startIndex = 0;
+        int endIntex = 0;
+        boolean startFound = false;
+
+        for (int i = 0; i < text.length(); i++) {
+            if (text.charAt(i) == '"') {
+                counter++;
+            }
+
+            if (counter == startQuote && startFound == false) {
+                startIndex = i + 1;
+                startFound = true;
+            } else if (counter == endQuote) {
+                endIntex = i;
+                break;
+            }
+        }
+
+        String truncatedString = text.substring(startIndex, Math.min(text.length(), endIntex));
+        
+        return truncatedString;
     }
 }

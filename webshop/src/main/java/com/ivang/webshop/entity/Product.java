@@ -34,7 +34,7 @@ public class Product implements Serializable {
     @OneToMany(cascade = { CascadeType.ALL }, fetch = LAZY, mappedBy = "product")
     private List<Item> items = new ArrayList<Item>();
 
-    @ManyToMany(cascade = { CascadeType.ALL })
+    @ManyToMany
     @JoinTable(name = "product_sale", joinColumns = @JoinColumn(name = "product_id"), inverseJoinColumns = @JoinColumn(name = "sale_id"))
     private List<Sale> sales = new ArrayList<Sale>();
 

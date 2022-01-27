@@ -33,7 +33,7 @@ public class Sale implements Serializable {
     @JoinColumn(name = "seller_id", referencedColumnName = "id", nullable = false)
     private Seller seller;
 
-    @ManyToMany(cascade = { CascadeType.ALL }, mappedBy = "sales")
+    @ManyToMany(mappedBy = "sales")
     private List<Product> products = new ArrayList<Product>();
 
     public Long getId() {
