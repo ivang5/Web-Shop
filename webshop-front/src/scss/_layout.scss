@@ -1,0 +1,12 @@
+.l-align-center {
+  display: flex;
+  align-items: center;
+}
+
+.l-content {
+  min-height: calc(100% - 8.3rem);
+
+  &-100 {
+    height: 100%;
+  }
+}

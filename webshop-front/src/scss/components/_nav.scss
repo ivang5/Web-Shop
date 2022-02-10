@@ -1,0 +1,24 @@
+.nav {
+  border-bottom: 1px solid $blue-300;
+  //   box-shadow: 0px 10px 10px $light-gray-2;
+
+  &__secondary .nav-item:first-child {
+    @include respond-to(992) {
+      order: 1;
+    }
+  }
+
+  &__cart {
+    display: flex;
+    align-content: center;
+    margin: 1rem 0;
+
+    @include respond-to(992) {
+      margin: 0 1.5rem 0 0;
+    }
+
+    &-icon {
+      padding-right: 0.3rem;
+    }
+  }
+}

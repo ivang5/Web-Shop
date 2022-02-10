@@ -1,0 +1,68 @@
+.login {
+  &-container {
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background: url("../../img/login-bg.jpg");
+    background-size: cover;
+    background-repeat: no-repeat;
+    z-index: -2;
+
+    @include respond-to(768) {
+      justify-content: unset;
+    }
+
+    .registration-form {
+      display: none;
+    }
+  }
+
+  &-bg-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 100%;
+    width: 100%;
+    background-color: $transparent-dark-2;
+  }
+
+  &-form {
+    z-index: 1;
+    position: relative;
+  }
+
+  &-overlay {
+    position: absolute;
+    inset: -25px;
+    z-index: -1;
+    background-color: $transparent-dark-4;
+    padding: 20px;
+    border-radius: 15px;
+
+    @include respond-to(576) {
+      inset: -40px;
+    }
+  }
+
+  &-form-link {
+    text-decoration: underline;
+    cursor: pointer;
+
+    &:hover {
+      text-decoration: none;
+    }
+  }
+}
+
+.registration {
+  .registration-form {
+    display: unset;
+    z-index: 1;
+    position: relative;
+  }
+
+  .login-form {
+    display: none;
+  }
+}

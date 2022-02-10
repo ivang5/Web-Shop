@@ -1,0 +1,39 @@
+.seller {
+  padding-top: 3rem;
+
+  &__img {
+    width: 60%;
+    height: auto;
+
+    @include respond-to(768) {
+      width: 80%;
+    }
+
+    &-wrapper {
+      display: flex;
+      justify-content: center;
+
+      @include respond-to(768) {
+        display: block;
+      }
+    }
+  }
+
+  &__info {
+    text-align: center;
+
+    @include respond-to(768) {
+      padding-left: 3rem;
+      text-align: start;
+    }
+  }
+
+  &__title {
+    font-size: 1.6rem;
+  }
+
+  &__text {
+    font-size: 1.1rem;
+    margin-bottom: 0.1rem;
+  }
+}

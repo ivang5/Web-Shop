@@ -1,0 +1,32 @@
+.profile {
+  align-items: center;
+
+  &__image {
+    width: 100%;
+    max-width: 17.5rem;
+    height: auto;
+  }
+
+  &__info {
+    @include respond-to(768) {
+      padding-left: 2rem;
+    }
+
+    &-header {
+      font-size: 1.2rem;
+      font-weight: 600;
+      background-color: $blue-100;
+      border-bottom-color: $blue-500;
+    }
+  }
+
+  &__modal {
+    &-footer {
+      justify-content: space-between;
+    }
+
+    &-btn-group button:last-child {
+      margin-left: 0.5rem;
+    }
+  }
+}

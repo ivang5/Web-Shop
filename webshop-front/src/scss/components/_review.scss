@@ -1,0 +1,21 @@
+.review {
+  &__header {
+    border-color: $blue-400;
+  }
+
+  &__img {
+    width: 1.7rem;
+    height: auto;
+  }
+
+  &__author {
+    display: inline-block;
+    font-size: 1.1rem;
+    font-weight: bold;
+    margin-bottom: 0;
+  }
+
+  &__text {
+    font-size: 1.1rem;
+  }
+}
