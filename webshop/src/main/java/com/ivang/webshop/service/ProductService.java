@@ -41,6 +41,30 @@ public class ProductService implements ProductServiceInterface {
         
         return productsDTO;
     }
+
+    @Override
+    public List<ProductDTO> findByActiveSellers() {
+        log.info("Fetching all products");
+        List<ProductDTO> productsDTO = new ArrayList<ProductDTO>();
+        
+        for(Product p : productRepository.findByActiveSellers()) {
+            productsDTO.add(new ProductDTO(p));
+        }
+        
+        return productsDTO;
+    }
+
+    @Override
+    public List<ProductDTO> findBySeller(String username) {
+        log.info("Fetching all products from seller {}", username);
+        List<ProductDTO> productsDTO = new ArrayList<ProductDTO>();
+
+        for(Product p : productRepository.findBySeller(username)) {
+            productsDTO.add(new ProductDTO(p));
+        }
+
+        return productsDTO;
+    }
     
     @Override
     public List<ProductDTO> findBySale(Long id) {
@@ -53,12 +77,18 @@ public class ProductService implements ProductServiceInterface {
 
         return productsDTO;
     }
+    
+    @Override
+    public List<String> getNamesByOrder(Long id) {
+        log.info("Fetching product names for order {}", id);
+        return productRepository.getNamesByOrder(id);
+    }
 
     @Override
     public void save(ProductDTO productDTO) {
         log.info("Saving new product {} to the database", productDTO.getId());
         Product product = new Product();
-        populateProduct(product, productDTO);
+        populateProduct(product, productDTO, false);
     }
 
     @Override
@@ -67,7 +97,7 @@ public class ProductService implements ProductServiceInterface {
         Product product = productRepository.getById(productDTO.getId());
 
         if (product != null) {
-            populateProduct(product, productDTO);
+            populateProduct(product, productDTO, true);
         }
     }
 
@@ -77,13 +107,15 @@ public class ProductService implements ProductServiceInterface {
         productRepository.deleteById(id);
     }
 
-    private void populateProduct(Product product, ProductDTO productDTO) {
+    private void populateProduct(Product product, ProductDTO productDTO, boolean updating) {
         product.setName(productDTO.getName());
         product.setDescription(productDTO.getDescription());
         product.setPrice(productDTO.getPrice());
         product.setProductType(productDTO.getProductType());
         product.setPicturePath(productDTO.getPicturePath());
-        product.setSeller(sellerRepository.getById(productDTO.getSeller().getId()));
+        if (!updating) {
+            product.setSeller(sellerRepository.getById(productDTO.getSeller().getId()));
+        }
         
         productRepository.save(product);
     }

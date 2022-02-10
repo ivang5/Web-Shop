@@ -11,5 +11,6 @@ public enum ProductType {
     sport,
     furniture,
     mobilePhones,
-    realEstate
+    realEstate,
+    other
 }

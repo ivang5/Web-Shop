@@ -1,7 +1,7 @@
 package com.ivang.webshop.filter;
 
 import static org.springframework.http.HttpHeaders.AUTHORIZATION;
-import static org.springframework.http.HttpStatus.FORBIDDEN;
+import static org.springframework.http.HttpStatus.UNAUTHORIZED;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 
 import java.io.IOException;
@@ -41,7 +41,7 @@ public class CustomAuthorizationFilter extends OncePerRequestFilter {
                 } catch (Exception exception) {
                     log.error("Error logging in: {}", exception.getMessage());
                     response.setHeader("error", exception.getMessage());
-                    response.setStatus(FORBIDDEN.value());
+                    response.setStatus(UNAUTHORIZED.value());
                     Map<String, String> error = new HashMap<>();
                     error.put("error_message", exception.getMessage());
                     response.setContentType(APPLICATION_JSON_VALUE);

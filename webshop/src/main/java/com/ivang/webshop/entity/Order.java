@@ -28,6 +28,8 @@ public class Order implements Serializable {
     private Date time;
     private boolean delivered = false;
     private Integer rate;
+
+    @Column(columnDefinition="TEXT")
     private String comment;
     private boolean anonymousComment = false;
     private boolean archivedComment = false;
@@ -36,7 +38,7 @@ public class Order implements Serializable {
     @JoinColumn(name = "buyer_id", referencedColumnName = "id", nullable = false)
     private Buyer buyer;
 
-    @OneToMany(cascade = { CascadeType.ALL }, fetch = EAGER, mappedBy = "order")
+    @OneToMany(cascade = { CascadeType.ALL }, fetch = LAZY, mappedBy = "order")
     private List<Item> items = new ArrayList<Item>();
 
     public Long getId() {

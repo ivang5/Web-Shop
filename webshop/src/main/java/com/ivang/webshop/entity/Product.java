@@ -24,11 +24,15 @@ public class Product implements Serializable {
     private Long id;
     
     private String name;
+
+    @Column(columnDefinition="TEXT")
     private String description;
     private double price;
 
     @Enumerated(EnumType.STRING)
     private ProductType productType;
+
+    @Column(columnDefinition="TEXT")
     private String picturePath;
 
     @OneToMany(cascade = { CascadeType.ALL }, fetch = LAZY, mappedBy = "product")

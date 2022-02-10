@@ -8,6 +8,7 @@ import com.ivang.webshop.entity.Sale;
 public interface SaleServiceInterface {
     
     public Sale findOne(Long id);
+    public Sale findOneByProduct(Long id);
     public List<SaleDTO> findAll();
     public List<SaleDTO> findBySeller(Long id);
     public List<SaleDTO> findByProduct(Long id);

@@ -12,5 +12,6 @@ public interface BuyerServiceInterface {
     public List<BuyerDTO> findAll();
     public void save(BuyerDTO buyer);
     public void update(BuyerDTO buyer);
+    public void handleBlock(Long id);
     public void remove(Long id);
 }

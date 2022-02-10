@@ -40,6 +40,9 @@ public class AdminService implements AdminServiceInterface, UserDetailsService {
         if (admin == null) {
             log.info("Admin {} not found in the database", username);
             return buyerService.loadUserByUsername(username);
+        } else if (admin.isBlocked()) {
+            log.info("Admin {} is blocked", username);
+            throw new UsernameNotFoundException("Admin with given username is blocked");
         } else {
             log.info("Admin {} found in the database", username);
         }
@@ -75,19 +78,24 @@ public class AdminService implements AdminServiceInterface, UserDetailsService {
     }
 
     @Override
-    public void save(AdminDTO adminDTO) {
-        log.info("Saving new admin {} to the database", adminDTO.getId());
-        Admin admin = new Admin();
-        populateAdmin(admin, adminDTO);
-    }
-
-    @Override
     public void update(AdminDTO adminDTO) {
         log.info("Updating admin {}", adminDTO.getId());
         Admin admin = adminRepository.getById(adminDTO.getId());
 
         if (admin != null) {
             populateAdmin(admin, adminDTO);
+        }
+    }
+
+    @Override
+    public void handleBlock(Long id) {
+        Admin admin = adminRepository.getById(id);
+        boolean isBlocked = admin.isBlocked();
+
+        if (isBlocked) {
+            admin.setBlocked(false);
+        } else {
+            admin.setBlocked(true);
         }
     }
 
@@ -101,7 +109,9 @@ public class AdminService implements AdminServiceInterface, UserDetailsService {
         admin.setFirstName(adminDTO.getFirstName());
         admin.setLastName(adminDTO.getLastName());
         admin.setUsername(adminDTO.getUsername());
-        admin.setPassword(passwordEncoder.encode(adminDTO.getPassword()));
+        if (!adminDTO.getPassword().isEmpty()) {
+            admin.setPassword(passwordEncoder.encode(adminDTO.getPassword()));
+        }
         admin.setBlocked(adminDTO.isBlocked());
         
         adminRepository.save(admin);

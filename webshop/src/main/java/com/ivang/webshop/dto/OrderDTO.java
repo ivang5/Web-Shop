@@ -5,7 +5,6 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-import com.ivang.webshop.entity.Item;
 import com.ivang.webshop.entity.Order;
 
 public class OrderDTO implements Serializable {
@@ -46,11 +45,6 @@ public class OrderDTO implements Serializable {
         this.anonymousComment = order.getAnonymousComment();
         this.archivedComment = order.getArchivedComment();
         this.buyer = new BuyerDTO(order.getBuyer());
-        List<ItemDTO> items = new ArrayList<ItemDTO>();
-        for (Item item : order.getItems()) {
-            items.add(new ItemDTO(item));
-        }
-        this.items = items;
     }
 
     public Long getId() {

@@ -65,6 +65,47 @@ public class OrderService implements OrderServiceInterface {
         orderRepository.deleteById(id);
     }
 
+    @Override
+    public List<OrderDTO> getByBuyer(Long id) {
+        log.info("Fetching all orders for buyer {}", id);
+
+        List<OrderDTO> ordersDTO = new ArrayList<OrderDTO>();
+
+        for(Order o : orderRepository.getByBuyer(id)) {
+            ordersDTO.add(new OrderDTO(o));
+        }
+
+        return ordersDTO;
+    }
+
+    @Override
+    public int getRateBySeller(Long id) {
+        return orderRepository.getRateBySeller(id);
+    }
+
+    @Override
+    public int getRatesNumBySeller(Long id) {
+        return orderRepository.getRatesNumBySeller(id);
+    }
+
+    @Override
+    public List<OrderDTO> getNonArchivedBySeller(Long id) {
+        log.info("Fetching all orders for seller {}", id);
+        List<OrderDTO> ordersDTO = new ArrayList<OrderDTO>();
+
+        for(Order o : orderRepository.findNonArcivedBySeller(id)) {
+            ordersDTO.add(new OrderDTO(o));
+        }
+
+        return ordersDTO;
+    }
+
+    @Override
+    public Order getLastOrderByBuyer(Long id) {
+        Long orderId =orderRepository.getLastOrderByBuyer(id);
+        return orderRepository.getById(orderId);
+    }
+
     private void populateOrder(Order order, OrderDTO orderDTO) {
         order.setTime(orderDTO.getTime());
         order.setDelivered(orderDTO.isDelivered());

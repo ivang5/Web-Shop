@@ -37,6 +37,9 @@ public class SellerService implements SellerServiceInterface, UserDetailsService
         if (seller == null) {
             log.info("Seller {} not found in the database", username);
             throw new UsernameNotFoundException("Seller not found in the database");
+        } else if (seller.isBlocked()) {
+            log.info("Seller {} is blocked", username);
+            throw new UsernameNotFoundException("Seller with given username is blocked");
         } else {
             log.info("Seller {} found in the database", username);
         }
@@ -72,6 +75,20 @@ public class SellerService implements SellerServiceInterface, UserDetailsService
     }
 
     @Override
+    public List<SellerDTO> findActive() {
+        log.info("Fetching all active sellers");
+        List<SellerDTO> sellersDTO = new ArrayList<SellerDTO>();
+
+        for (Seller s : sellerRepository.findAll()) {
+            if (!s.isBlocked()) {
+                sellersDTO.add(new SellerDTO(s));
+            }
+        }
+
+        return sellersDTO;
+    }
+
+    @Override
     public void save(SellerDTO sellerDTO) {
         log.info("Saving new seller {} to the database", sellerDTO.getId());
         Seller seller = new Seller();
@@ -89,6 +106,18 @@ public class SellerService implements SellerServiceInterface, UserDetailsService
     }
 
     @Override
+    public void handleBlock(Long id) {
+        Seller seller = sellerRepository.getById(id);
+        boolean isBlocked = seller.isBlocked();
+
+        if (isBlocked) {
+            seller.setBlocked(false);
+        } else {
+            seller.setBlocked(true);
+        }
+    }
+
+    @Override
     public void remove(Long id) {
         log.info("Removing seller {}", id);
         sellerRepository.deleteById(id);
@@ -98,7 +127,9 @@ public class SellerService implements SellerServiceInterface, UserDetailsService
         seller.setFirstName(sellerDTO.getFirstName());
         seller.setLastName(sellerDTO.getLastName());
         seller.setUsername(sellerDTO.getUsername());
-        seller.setPassword(passwordEncoder.encode(sellerDTO.getPassword()));
+        if (!sellerDTO.getPassword().isEmpty()) {
+            seller.setPassword(passwordEncoder.encode(sellerDTO.getPassword()));
+        }
         seller.setBlocked(sellerDTO.isBlocked());
         seller.setOperatesFrom(sellerDTO.getOperatesFrom());
         seller.setEmail(sellerDTO.getEmail());

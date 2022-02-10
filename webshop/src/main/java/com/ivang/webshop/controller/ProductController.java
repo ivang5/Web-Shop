@@ -33,20 +33,35 @@ public class ProductController {
         return new ResponseEntity<List<ProductDTO>>(productService.findAll(), HttpStatus.OK);
     }
 
+    @GetMapping(value = "/active")
+    public ResponseEntity<List<ProductDTO>> getAllActiveProducts() {
+        return new ResponseEntity<List<ProductDTO>>(productService.findByActiveSellers(), HttpStatus.OK);
+    }
+    
     @GetMapping(value = "/{id}")
     public ResponseEntity<ProductDTO> getProductById(@PathVariable("id") Long id) {
-		Product product = productService.findOne(id);
+        Product product = productService.findOne(id);
 		
 		if(product == null) {
-			return new ResponseEntity<ProductDTO>(HttpStatus.NOT_FOUND);
+            return new ResponseEntity<ProductDTO>(HttpStatus.NOT_FOUND);
 		}
 		
 		return new ResponseEntity<ProductDTO>(new ProductDTO(product), HttpStatus.OK);
 	}
+    
+    @GetMapping(value= "/seller/{username}")
+    public ResponseEntity<List<ProductDTO>> getProductsBySeller(@PathVariable("username") String username) {
+        return new ResponseEntity<List<ProductDTO>>(productService.findBySeller(username), HttpStatus.OK);
+    }
 
     @GetMapping(value = "/sale/{id}")
-    public ResponseEntity<List<ProductDTO>> getProductBySale(@PathVariable("id") Long id) {
+    public ResponseEntity<List<ProductDTO>> getProductsBySale(@PathVariable("id") Long id) {
 		return new ResponseEntity<List<ProductDTO>>(productService.findBySale(id), HttpStatus.OK);
+	}
+
+    @GetMapping(value = "/name/order/{id}")
+    public ResponseEntity<List<String>> getNamesByOrder(@PathVariable("id") Long id) {
+		return new ResponseEntity<List<String>>(productService.getNamesByOrder(id), HttpStatus.OK);
 	}
 
     @PostMapping
@@ -71,7 +86,7 @@ public class ProductController {
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
-    @DeleteMapping
+    @DeleteMapping(value = "/{id}")
     public ResponseEntity<Void> deleteProduct(@PathVariable Long id) {
         Product product = productService.findOne(id);
 

@@ -44,6 +44,41 @@ public class OrderController {
 		return new ResponseEntity<OrderDTO>(new OrderDTO(order), HttpStatus.OK);
 	}
 
+    @GetMapping(value = "/rate/seller/{id}")
+    public ResponseEntity<Integer> getRateBySellerId(@PathVariable("id") Long id) {
+        int rate = orderService.getRateBySeller(id);
+
+        return new ResponseEntity<Integer>(rate, HttpStatus.OK);
+    }
+
+    @GetMapping(value = "/ratecount/seller/{id}")
+    public ResponseEntity<Integer> getRatesNumBySellerId(@PathVariable("id") Long id) {
+        int ratesCount = orderService.getRatesNumBySeller(id);
+
+        return new ResponseEntity<Integer>(ratesCount, HttpStatus.OK);
+    }
+
+    @GetMapping(value = "/seller/{id}")
+    public ResponseEntity<List<OrderDTO>> getOrdersSellerId(@PathVariable("id") Long id) {
+        return new ResponseEntity<List<OrderDTO>>(orderService.getNonArchivedBySeller(id), HttpStatus.OK);
+    }
+
+    @GetMapping(value = "/buyer/{id}")
+    public ResponseEntity<List<OrderDTO>> getByBuyer(@PathVariable("id") Long id) {
+        return new ResponseEntity<List<OrderDTO>>(orderService.getByBuyer(id), HttpStatus.OK);
+    }
+
+    @GetMapping(value = "/last/buyer/{id}")
+    public ResponseEntity<OrderDTO> getLastOrderByBuyer(@PathVariable("id") Long id) {
+        Order order = orderService.getLastOrderByBuyer(id);
+		
+		if(order == null) {
+			return new ResponseEntity<OrderDTO>(HttpStatus.NOT_FOUND);
+		}
+		
+		return new ResponseEntity<OrderDTO>(new OrderDTO(order), HttpStatus.OK);
+    }
+
     @PostMapping
     public ResponseEntity<?> createOrder(@RequestBody OrderDTO order) {
         try {

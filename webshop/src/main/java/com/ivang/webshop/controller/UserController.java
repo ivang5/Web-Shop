@@ -71,9 +71,14 @@ public class UserController {
         return ResponseEntity.ok().body(sellerService.findAll());
     }
 
-    @GetMapping(value = "/admin/{id}")
-    public ResponseEntity<AdminDTO> getAdminById(@PathVariable("id") Long id) {
-        Admin admin = adminService.findOne(id);
+    @GetMapping(value = "/seller/active")
+    public ResponseEntity<List<SellerDTO>> getActiveSellers() {
+        return ResponseEntity.ok().body(sellerService.findActive());
+    }
+
+    @GetMapping(value = "/admin/{username}")
+    public ResponseEntity<AdminDTO> getAdminByUsername(@PathVariable("username") String username) {
+        Admin admin = adminService.findByUsername(username);
 
         if (admin == null) {
             return ResponseEntity.notFound().build();
@@ -82,9 +87,9 @@ public class UserController {
         return ResponseEntity.ok().body(new AdminDTO(admin));
     }
 
-    @GetMapping(value = "/buyer/{id}")
-    public ResponseEntity<BuyerDTO> getBuyerById(@PathVariable("id") Long id) {
-        Buyer buyer = buyerService.findOne(id);
+    @GetMapping(value = "/buyer/{username}")
+    public ResponseEntity<BuyerDTO> getBuyerByUsername(@PathVariable("username") String username) {
+        Buyer buyer = buyerService.findByUsername(username);
 
         if (buyer == null) {
             return ResponseEntity.notFound().build();
@@ -93,9 +98,9 @@ public class UserController {
         return ResponseEntity.ok().body(new BuyerDTO(buyer));
     }
 
-    @GetMapping(value = "/seller/{id}")
-    public ResponseEntity<SellerDTO> getSellerById(@PathVariable("id") Long id) {
-        Seller seller = sellerService.findOne(id);
+    @GetMapping(value = "/seller/{username}")
+    public ResponseEntity<SellerDTO> getSellerByUsername(@PathVariable("username") String username) {
+        Seller seller = sellerService.findByUsername(username);
 
         if (seller == null) {
             return ResponseEntity.notFound().build();
@@ -104,20 +109,14 @@ public class UserController {
         return ResponseEntity.ok().body(new SellerDTO(seller));
     }
 
-    @PostMapping(value = "/admin")
-    public ResponseEntity<?> createAdmin(@RequestBody AdminDTO admin) {
-        try {
-            adminService.save(admin);
-        } catch (Exception e) {
-            return ResponseEntity.badRequest().body("Bad request, something went wrong");
-        }
-
-        URI uri = URI.create(ServletUriComponentsBuilder.fromCurrentContextPath().path("/shop/users/admin").toUriString());
-        return ResponseEntity.created(uri).build();
-    }
-
     @PostMapping(value = "/buyer")
     public ResponseEntity<?> createBuyer(@RequestBody BuyerDTO buyer) {
+        boolean checkUsername = isUsernameFree(buyer.getUsername());
+
+        if(!checkUsername) {
+            return ResponseEntity.unprocessableEntity().body("User with the given username already exists!");
+        }
+
         try {
             buyerService.save(buyer);
         } catch (Exception e) {
@@ -130,6 +129,12 @@ public class UserController {
 
     @PostMapping(value = "/seller")
     public ResponseEntity<?> createSeller(@RequestBody SellerDTO seller) {
+        boolean checkUsername = isUsernameFree(seller.getUsername());
+
+        if(!checkUsername) {
+            return ResponseEntity.unprocessableEntity().body("User with the given username already exists!");
+        }
+
         try {
             sellerService.save(seller);
         } catch (Exception e) {
@@ -151,6 +156,17 @@ public class UserController {
         return ResponseEntity.ok().build();
     }
 
+    @PutMapping(value = "/admin/handle-block/{id}")
+    public ResponseEntity<?> handleBlockAdmin(@PathVariable("id") Long id) {
+        try {
+            adminService.handleBlock(id);
+        } catch (Exception e) {
+            return new ResponseEntity<String>("Bad request, something went wrong", HttpStatus.BAD_REQUEST);
+        }
+
+        return ResponseEntity.ok().build();
+    }
+
     @PutMapping(value = "/buyer")
     public ResponseEntity<?> updateBuyer(@RequestBody BuyerDTO buyer) {
         try {
@@ -162,10 +178,32 @@ public class UserController {
         return ResponseEntity.ok().build();
     }
 
+    @PutMapping(value = "/buyer/handle-block/{id}")
+    public ResponseEntity<?> handleBlockBuyer(@PathVariable("id") Long id) {
+        try {
+            buyerService.handleBlock(id);
+        } catch (Exception e) {
+            return new ResponseEntity<String>("Bad request, something went wrong", HttpStatus.BAD_REQUEST);
+        }
+
+        return ResponseEntity.ok().build();
+    }
+
     @PutMapping(value = "/seller")
     public ResponseEntity<?> updateSeller(@RequestBody SellerDTO seller) {
         try {
             sellerService.update(seller);
+        } catch (Exception e) {
+            return new ResponseEntity<String>("Bad request, something went wrong", HttpStatus.BAD_REQUEST);
+        }
+
+        return ResponseEntity.ok().build();
+    }
+
+    @PutMapping(value = "/seller/handle-block/{id}")
+    public ResponseEntity<?> handleBlockSeller(@PathVariable("id") Long id) {
+        try {
+            sellerService.handleBlock(id);
         } catch (Exception e) {
             return new ResponseEntity<String>("Bad request, something went wrong", HttpStatus.BAD_REQUEST);
         }
@@ -252,5 +290,17 @@ public class UserController {
         List<String> authorities = Arrays.asList(role);
 
         return authorities;
+    }
+
+    public boolean isUsernameFree(String username) {
+        Admin admin = adminService.findByUsername(username);
+        Seller seller = sellerService.findByUsername(username);
+        Buyer buyer = buyerService.findByUsername(username);
+
+        if (admin == null && seller == null && buyer == null) {
+            return true;
+        }
+
+        return false;
     }
 }

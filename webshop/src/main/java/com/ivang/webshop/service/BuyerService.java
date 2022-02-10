@@ -38,6 +38,9 @@ public class BuyerService implements BuyerServiceInterface, UserDetailsService {
         if (buyer == null) {
             log.info("Buyer {} not found in the database", username);
             return sellerService.loadUserByUsername(username);
+        } else if (buyer.isBlocked()) {
+            log.info("Buyer {} is blocked", username);
+            throw new UsernameNotFoundException("Buyer with given username is blocked");
         } else {
             log.info("Buyer {} found in the database", username);
         }
@@ -90,6 +93,18 @@ public class BuyerService implements BuyerServiceInterface, UserDetailsService {
     }
 
     @Override
+    public void handleBlock(Long id) {
+        Buyer buyer = buyerRepository.getById(id);
+        boolean isBlocked = buyer.isBlocked();
+
+        if (isBlocked) {
+            buyer.setBlocked(false);
+        } else {
+            buyer.setBlocked(true);
+        }
+    }
+
+    @Override
     public void remove(Long id) {
         log.info("Removing buyer {}", id);
         buyerRepository.deleteById(id);
@@ -99,7 +114,9 @@ public class BuyerService implements BuyerServiceInterface, UserDetailsService {
         buyer.setFirstName(buyerDTO.getFirstName());
         buyer.setLastName(buyerDTO.getLastName());
         buyer.setUsername(buyerDTO.getUsername());
-        buyer.setPassword(passwordEncoder.encode(buyerDTO.getPassword()));
+        if (!buyerDTO.getPassword().isEmpty()) {
+            buyer.setPassword(passwordEncoder.encode(buyerDTO.getPassword()));
+        }
         buyer.setBlocked(buyerDTO.isBlocked());
         buyer.setAddress(buyerDTO.getAddress());
         

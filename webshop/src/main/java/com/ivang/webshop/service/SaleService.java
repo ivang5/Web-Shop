@@ -31,6 +31,12 @@ public class SaleService implements SaleServiceInterface {
     }
 
     @Override
+    public Sale findOneByProduct(Long id) {
+        log.info("Fetching sale for product {}", id);
+        return saleRepository.findOneByProduct(id);
+    }
+
+    @Override
     public List<SaleDTO> findAll() {
         log.info("Fetching all sales");
         List<SaleDTO> salesDTO = new ArrayList<SaleDTO>();

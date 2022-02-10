@@ -34,8 +34,19 @@ public class SaleController {
     }
     
     @GetMapping(value = "/{id}")
-    public ResponseEntity<SaleDTO> getItemById(@PathVariable("id") Long id) {
+    public ResponseEntity<SaleDTO> getSaleById(@PathVariable("id") Long id) {
         Sale sale = saleService.findOne(id);
+		
+		if(sale == null) {
+            return new ResponseEntity<SaleDTO>(HttpStatus.NOT_FOUND);
+		}
+		
+		return new ResponseEntity<SaleDTO>(new SaleDTO(sale), HttpStatus.OK);
+	}
+
+    @GetMapping(value = "/single/product/{id}")
+    public ResponseEntity<SaleDTO> getSaleByProduct(@PathVariable("id") Long id) {
+        Sale sale = saleService.findOneByProduct(id);
 		
 		if(sale == null) {
             return new ResponseEntity<SaleDTO>(HttpStatus.NOT_FOUND);

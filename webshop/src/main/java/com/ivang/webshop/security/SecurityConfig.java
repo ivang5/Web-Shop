@@ -16,7 +16,8 @@ import org.springframework.security.config.annotation.web.configuration.WebSecur
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
-import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.servlet.config.annotation.CorsRegistry;
+import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 import lombok.RequiredArgsConstructor;
 
@@ -37,21 +38,44 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     protected void configure(HttpSecurity http) throws Exception {
         CustomAuthenticationFilter customAuthenticationFilter = new CustomAuthenticationFilter(authenticationManagerBean());
         customAuthenticationFilter.setFilterProcessesUrl("/shop/login");
-        http.csrf().disable();
-        http.sessionManagement().sessionCreationPolicy(STATELESS);
-        http.authorizeRequests().antMatchers("/shop/login/**", "/shop/users/token/**").permitAll();
-        http.authorizeRequests().antMatchers(HttpMethod.GET, "/shop/users/**").permitAll();
-        http.authorizeRequests().antMatchers("/shop/**").hasAnyAuthority("admin");
-        http.authorizeRequests().antMatchers("/shop/products/**").hasAnyAuthority("seller");
-        http.authorizeRequests().antMatchers("/shop/sales/**").hasAnyAuthority("seller");
-        http.authorizeRequests().antMatchers(HttpMethod.GET, "/shop/products/**").hasAnyAuthority("buyer");
-        http.authorizeRequests().antMatchers(HttpMethod.GET, "/shop/sales/**").hasAnyAuthority("buyer");
-        http.authorizeRequests().antMatchers("/shop/orders/**").hasAnyAuthority("buyer");
-        http.authorizeRequests().anyRequest().authenticated();
+        http.cors();
+        http.csrf().disable()
+            .sessionManagement()
+            .sessionCreationPolicy(STATELESS)
+            .and()
+            .authorizeRequests()
+            .antMatchers("/shop/login/**", "/shop/users/token/**").permitAll()
+            .antMatchers(HttpMethod.GET, "/shop/users/**").permitAll()
+            .antMatchers(HttpMethod.POST, "/shop/users/**").permitAll()
+            .antMatchers(HttpMethod.PUT, "/shop/users/admin/**").hasAnyAuthority("admin")
+            .antMatchers(HttpMethod.PUT, "/shop/users/seller/**").hasAnyAuthority("admin", "seller")
+            .antMatchers(HttpMethod.PUT, "/shop/users/buyer/**").hasAnyAuthority("admin", "buyer")
+            .antMatchers(HttpMethod.GET, "/shop/products/**").hasAnyAuthority("admin", "seller", "buyer")
+            .antMatchers("/shop/products/**").hasAnyAuthority("admin", "seller")
+            .antMatchers(HttpMethod.GET, "/shop/sales/**").hasAnyAuthority("admin", "buyer")
+            .antMatchers("/shop/sales/**").hasAnyAuthority("seller")
+            .antMatchers(HttpMethod.GET, "/shop/orders/**").hasAnyAuthority("admin", "seller", "buyer")
+            .antMatchers(HttpMethod.PUT, "/shop/orders/**").hasAnyAuthority("admin", "seller", "buyer")
+            .antMatchers("/shop/orders/**").hasAnyAuthority("admin", "buyer")
+            .antMatchers(HttpMethod.GET, "/shop/items/**").hasAnyAuthority("admin", "seller", "buyer")
+            .antMatchers("/shop/items/**").hasAnyAuthority("admin", "buyer")
+            .antMatchers("/shop/**").hasAnyAuthority("admin")
+            .anyRequest().authenticated();
         http.addFilter(customAuthenticationFilter);
         http.addFilterBefore(new CustomAuthorizationFilter(), UsernamePasswordAuthenticationFilter.class);
-        http.cors().configurationSource(request -> new CorsConfiguration().applyPermitDefaultValues());
     }
+
+    @Bean
+	public WebMvcConfigurer corsConfigurer() {
+		return new WebMvcConfigurer() {
+			@Override
+			public void addCorsMappings(CorsRegistry registry) {
+				registry.addMapping("/**")
+				.allowedOrigins("*")
+				.allowedMethods("GET", "PUT", "POST", "PATCH", "DELETE", "OPTIONS");
+			}
+		};
+	}
 
     @Bean
     @Override

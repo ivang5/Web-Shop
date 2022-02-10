@@ -20,7 +20,7 @@ public class Seller extends User {
     private String address;
     private String name;
 
-    @OneToMany(cascade = { CascadeType.ALL }, fetch = EAGER, mappedBy = "seller")
+    @OneToMany(cascade = { CascadeType.ALL }, fetch = LAZY, mappedBy = "seller")
     private List<Product> products = new ArrayList<Product>();
 
     @OneToMany(cascade = { CascadeType.ALL }, fetch = LAZY, mappedBy = "seller")

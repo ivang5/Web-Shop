@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.ivang.webshop.entity.Buyer;
-import com.ivang.webshop.entity.Order;
 
 public class BuyerDTO extends UserDTO {
 
@@ -24,11 +23,6 @@ public class BuyerDTO extends UserDTO {
     public BuyerDTO(Buyer buyer) {
         super(buyer);
         this.address = buyer.getAddress();
-        ArrayList<OrderDTO> orders = new ArrayList<OrderDTO>();
-        for (Order order : buyer.getOrders()) {
-            orders.add(new OrderDTO(order));
-        }
-        this.orders = orders;
     }
 
     public String getAddress() {

@@ -10,7 +10,7 @@ public interface AdminServiceInterface {
     public Admin findOne(Long id);
     public Admin findByUsername(String username);
     public List<AdminDTO> findAll();
-    public void save(AdminDTO admin);
     public void update(AdminDTO admin);
+    public void handleBlock(Long id);
     public void remove(Long id);
 }
