@@ -59,6 +59,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
             .antMatchers("/shop/orders/**").hasAnyAuthority("admin", "buyer")
             .antMatchers(HttpMethod.GET, "/shop/items/**").hasAnyAuthority("admin", "seller", "buyer")
             .antMatchers("/shop/items/**").hasAnyAuthority("admin", "buyer")
+            .antMatchers(HttpMethod.GET, "/shop/files/**").hasAnyAuthority("admin", "seller", "buyer")
+            .antMatchers("/shop/files/**").hasAnyAuthority("admin", "seller")
             .antMatchers("/shop/**").hasAnyAuthority("admin")
             .anyRequest().authenticated();
         http.addFilter(customAuthenticationFilter);

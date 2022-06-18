@@ -35,6 +35,10 @@ public class Product implements Serializable {
     @Column(columnDefinition="TEXT")
     private String picturePath;
 
+    @OneToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "detailed_desc_id", referencedColumnName = "id")
+    private DetailedDescription detailedDescription;
+
     @OneToMany(cascade = { CascadeType.ALL }, fetch = LAZY, mappedBy = "product")
     private List<Item> items = new ArrayList<Item>();
 
@@ -92,6 +96,14 @@ public class Product implements Serializable {
 
     public void setPicturePath(String picturePath) {
         this.picturePath = picturePath;
+    }
+
+    public DetailedDescription getDetailedDescription() {
+        return detailedDescription;
+    }
+
+    public void setDetailedDescription(DetailedDescription detailedDescription) {
+        this.detailedDescription = detailedDescription;
     }
 
     public List<Item> getItems() {
