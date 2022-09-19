@@ -14,6 +14,7 @@ export default function ProductDetails({ cart, setCart }) {
   const [product, setProduct] = useState({});
   const [seller, setSeller] = useState({});
   const [sale, setSale] = useState({});
+  const [pdf, setPdf] = useState({});
   const [sellerRating, setSellerRating] = useState(0);
   const [ratesCount, setRatesCount] = useState(0);
   const [operatesFrom, setOperatesFrom] = useState("");
@@ -25,11 +26,12 @@ export default function ProductDetails({ cart, setCart }) {
   const priceRef = useRef();
   const productTypeRef = useRef();
   const picturePathRef = useRef();
+  const [selectedFile, setSelectedFile] = useState(null);
   const editModal = useRef();
   const removalModal = useRef();
   const toast = useRef();
   const { id } = useParams();
-  const { user, getRole } = useAuth();
+  const { user, getRole, authTokens } = useAuth();
   const api = useFetch();
   const navigate = useNavigate();
 
@@ -67,6 +69,10 @@ export default function ProductDetails({ cart, setCart }) {
       getSellerRating(data.seller.id);
       getRatesCount(data.seller.id);
       setOperatesFrom(dateFormatter(data.seller.operatesFrom));
+
+      if (data.detailedDescription) {
+        setPdf(data.detailedDescription);
+      }
     }
   };
 
@@ -95,8 +101,22 @@ export default function ProductDetails({ cart, setCart }) {
   };
 
   const changeProduct = async () => {
-    const changedProduct = getChangedProduct();
+    let changedProduct = getChangedProduct();
 
+    if (selectedFile) {
+      const file = await uploadFile();
+      changedProduct.detailedDescription = file;
+      await pushProduct(changedProduct);
+    } else {
+      await pushProduct(changedProduct);
+    }
+
+    getProduct(product.id);
+    setToastMessage("Product successfully updated.");
+    showToast();
+  };
+
+  const pushProduct = async (changedProduct) => {
     await api("/shop/products", {
       method: "PUT",
       headers: {
@@ -104,10 +124,21 @@ export default function ProductDetails({ cart, setCart }) {
       },
       body: JSON.stringify(changedProduct),
     });
+  };
 
-    getProduct(product.id);
-    setToastMessage("Product successfully updated.");
-    showToast();
+  const uploadFile = async () => {
+    const formData = new FormData();
+    formData.append("file", selectedFile);
+
+    const response = await fetch(`http://localhost:8080/shop/files`, {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${authTokens.access_token}`,
+      },
+      body: formData,
+    });
+
+    return await response.json();
   };
 
   const removeProduct = async () => {
@@ -129,6 +160,30 @@ export default function ProductDetails({ cart, setCart }) {
     };
 
     return changedProduct;
+  };
+
+  const downloadPdf = async () => {
+    const FileDownload = require("js-file-download");
+    const response = await fetch(
+      `http://localhost:8080/shop/files/download/${pdf.id}`,
+      {
+        method: "GET",
+        headers: {
+          Authorization: `Bearer ${authTokens.access_token}`,
+        },
+      }
+    );
+
+    let data;
+
+    try {
+      if (response.status === 200) {
+        data = await response.blob();
+        FileDownload(data, `${pdf.name}`);
+      }
+    } catch (error) {
+      console.error(error);
+    }
   };
 
   const addToCart = () => {
@@ -213,6 +268,11 @@ export default function ProductDetails({ cart, setCart }) {
           </span>
           <h4 className="card-title">{product.name}</h4>
           <p className="card-text">{product.description}</p>
+          {pdf.id && (
+            <span className="product__link" onClick={downloadPdf}>
+              <i className="bi bi-download"></i> Download detailed description
+            </span>
+          )}
           <span
             className={`product__info-price ${
               sale.id && "text-decoration-line-through fs-6 fw-normal"
@@ -246,7 +306,6 @@ export default function ProductDetails({ cart, setCart }) {
               </button>
             </span>
           )}
-
           {getRole() === "buyer" && inCart && (
             <span>
               <button
@@ -257,7 +316,6 @@ export default function ProductDetails({ cart, setCart }) {
               </button>
             </span>
           )}
-
           {getRole() === "seller" && seller.username == user.sub && (
             <div className="d-flex">
               <button
@@ -414,6 +472,16 @@ export default function ProductDetails({ cart, setCart }) {
                     defaultValue={product.picturePath}
                   />
                   <label htmlFor="picturePathInput">Picture path</label>
+                </div>
+                <div className="form-floating mb-3">
+                  <input
+                    type="file"
+                    className="form-control form-control-sm form-file"
+                    id="fileInput"
+                    placeholder="Detailed description (PDF)"
+                    onChange={(e) => setSelectedFile(e.target.files[0])}
+                  />
+                  <label htmlFor="fileInput">Detailed description (PDF)</label>
                 </div>
               </form>
             </div>

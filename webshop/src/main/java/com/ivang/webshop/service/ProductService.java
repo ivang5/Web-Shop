@@ -1,5 +1,6 @@
 package com.ivang.webshop.service;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -7,6 +8,9 @@ import javax.transaction.Transactional;
 
 import com.ivang.webshop.dto.ProductDTO;
 import com.ivang.webshop.entity.Product;
+import com.ivang.webshop.lucene.indexing.ProductIndexer;
+import com.ivang.webshop.lucene.model.shop.dto.ProductRequestDTO;
+import com.ivang.webshop.repository.FileRepository;
 import com.ivang.webshop.repository.ProductRepository;
 import com.ivang.webshop.repository.SellerRepository;
 
@@ -23,6 +27,8 @@ public class ProductService implements ProductServiceInterface {
 
     private final ProductRepository productRepository;
     private final SellerRepository sellerRepository;
+    private final FileRepository fileRepository;
+    private final ProductIndexer productIndexer;
 
     @Override
     public Product findOne(Long id) {
@@ -86,18 +92,20 @@ public class ProductService implements ProductServiceInterface {
 
     @Override
     public void save(ProductDTO productDTO) {
-        log.info("Saving new product {} to the database", productDTO.getId());
+        log.info("Saving new product {} to the database", productDTO.getName());
         Product product = new Product();
-        populateProduct(product, productDTO, false);
+        ProductRequestDTO productRequestDTO = new ProductRequestDTO();
+        populateProduct(product, productDTO, productRequestDTO, false);
     }
 
     @Override
     public void update(ProductDTO productDTO) {
         log.info("Updating product {}", productDTO.getId());
         Product product = productRepository.getById(productDTO.getId());
+        ProductRequestDTO productRequestDTO = new ProductRequestDTO();
 
         if (product != null) {
-            populateProduct(product, productDTO, true);
+            populateProduct(product, productDTO, productRequestDTO, true);
         }
     }
 
@@ -105,18 +113,38 @@ public class ProductService implements ProductServiceInterface {
     public void remove(Long id) {
         log.info("Removing product {}", id);
         productRepository.deleteById(id);
+        productIndexer.deleteProduct(id);
     }
 
-    private void populateProduct(Product product, ProductDTO productDTO, boolean updating) {
+    private void populateProduct(Product product, ProductDTO productDTO, ProductRequestDTO productRequestDTO, boolean updating) {
         product.setName(productDTO.getName());
+        productRequestDTO.setName(productDTO.getName()); 
         product.setDescription(productDTO.getDescription());
+        productRequestDTO.setDescription(productDTO.getDescription());
         product.setPrice(productDTO.getPrice());
+        productRequestDTO.setPrice(productDTO.getPrice()); 
         product.setProductType(productDTO.getProductType());
         product.setPicturePath(productDTO.getPicturePath());
+        if (productDTO.getDetailedDescription() != null) {
+            product.setDetailedDescription(fileRepository.getById(productDTO.getDetailedDescription().getId()));
+            productRequestDTO.setDetailedDescription(productDTO.getDetailedDescription().getId() + "-" + productDTO.getDetailedDescription().getName()); 
+        }
         if (!updating) {
             product.setSeller(sellerRepository.getById(productDTO.getSeller().getId()));
         }
         
-        productRepository.save(product);
+        Product newProduct = productRepository.save(product);
+
+        try {
+            productRequestDTO.setAssociatedId(newProduct.getId());
+
+            if (updating) {
+                productIndexer.deleteProduct(productRequestDTO.getAssociatedId());
+            }
+            
+            productIndexer.indexProduct(productRequestDTO);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 }

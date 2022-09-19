@@ -18,6 +18,7 @@ public class ProductDTO implements Serializable {
     private double price;
     private ProductType productType;
     private String picturePath;
+    private DetailedDescriptionDTO detailedDescription;
     private List<ItemDTO> items = new ArrayList<ItemDTO>();
     private List<SaleDTO> sales = new ArrayList<SaleDTO>();
     private SellerDTO seller;
@@ -37,6 +38,20 @@ public class ProductDTO implements Serializable {
         this.seller = seller;
     }
 
+    public ProductDTO(Long id, String name, String description, double price, ProductType productType, String picturePath, DetailedDescriptionDTO detailedDescription, List<ItemDTO> items,
+            List<SaleDTO> sales, SellerDTO seller) {
+        this.id = id;
+        this.name = name;
+        this.description = description;
+        this.price = price;
+        this.productType = productType;
+        this.picturePath = picturePath;
+        this.detailedDescription = detailedDescription;
+        this.items = items;
+        this.sales = sales;
+        this.seller = seller;
+    }
+
     public ProductDTO(Product product) {
         this.id = product.getId();
         this.name = product.getName();
@@ -44,6 +59,9 @@ public class ProductDTO implements Serializable {
         this.price = product.getPrice();
         this.productType = product.getProductType();
         this.picturePath = product.getPicturePath();
+        if (product.getDetailedDescription() != null) {
+            this.detailedDescription = new DetailedDescriptionDTO(product.getDetailedDescription());
+        }
         List<SaleDTO> sales = new ArrayList<SaleDTO>();
         for (Sale sale : product.getSales()) {
             sales.add(new SaleDTO(sale));
@@ -97,6 +115,14 @@ public class ProductDTO implements Serializable {
 
     public void setPicturePath(String picturePath) {
         this.picturePath = picturePath;
+    }
+
+    public DetailedDescriptionDTO getDetailedDescription() {
+        return detailedDescription;
+    }
+
+    public void setDetailedDescription(DetailedDescriptionDTO detailedDescription) {
+        this.detailedDescription = detailedDescription;
     }
 
     public List<ItemDTO> getItems() {

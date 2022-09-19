@@ -14,9 +14,16 @@ export default function Products({ cart, setCart }) {
   const priceRef = useRef();
   const productTypeRef = useRef();
   const picturePathRef = useRef();
+  const searchRef = useRef();
+  const searchPriceFromRef = useRef();
+  const searchPriceToRef = useRef();
+  const searchByNameRef = useRef();
+  const searchByDescRef = useRef();
+  const searchByPriceRef = useRef();
+  const [selectedFile, setSelectedFile] = useState(null);
   const modal = useRef();
   const toast = useRef();
-  const { user, getRole } = useAuth();
+  const { user, getRole, authTokens } = useAuth();
   const { username } = useParams();
   const api = useFetch();
 
@@ -56,6 +63,19 @@ export default function Products({ cart, setCart }) {
       seller: seller,
     };
 
+    if (selectedFile) {
+      const file = await uploadFile();
+      product.detailedDescription = file;
+      await pushProduct(product);
+    } else {
+      await pushProduct(product);
+    }
+
+    getProducts();
+    showToast();
+  };
+
+  const pushProduct = async (product) => {
     await api("/shop/products", {
       method: "POST",
       headers: {
@@ -63,9 +83,6 @@ export default function Products({ cart, setCart }) {
       },
       body: JSON.stringify(product),
     });
-
-    getProducts();
-    showToast();
   };
 
   const getSeller = async () => {
@@ -74,6 +91,21 @@ export default function Products({ cart, setCart }) {
     if (response.status === 200) {
       setSeller(data);
     }
+  };
+
+  const uploadFile = async () => {
+    const formData = new FormData();
+    formData.append("file", selectedFile);
+
+    const response = await fetch(`http://localhost:8080/shop/files`, {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${authTokens.access_token}`,
+      },
+      body: formData,
+    });
+
+    return await response.json();
   };
 
   const showModal = () => {
@@ -115,6 +147,74 @@ export default function Products({ cart, setCart }) {
           </Link>
         </h1>
       )}
+      <div className="search-form mt-5 p-3">
+        <div className="mb-3">
+          <h5>Search</h5>
+          <div className="d-block">
+            <span className="d-inline-block">By:</span>
+            <div className="d-inline-block mb-3 mx-3 form-check">
+              <input
+                type="checkbox"
+                className="form-check-input"
+                id="nameCheck"
+                ref={searchByNameRef}
+              />
+              <label className="form-check-label" htmlFor="nameCheck">
+                Name
+              </label>
+            </div>
+            <div className="d-inline-block mb-3 form-check">
+              <input
+                type="checkbox"
+                className="form-check-input"
+                id="descCheck"
+                ref={searchByDescRef}
+              />
+              <label className="form-check-label" htmlFor="descCheck">
+                Description
+              </label>
+            </div>
+            <div className="d-inline-block mb-3 mx-3 form-check">
+              <input
+                type="checkbox"
+                className="form-check-input"
+                id="priceCheck"
+                ref={searchByPriceRef}
+              />
+              <label className="form-check-label" htmlFor="priceCheck">
+                Price
+              </label>
+            </div>
+          </div>
+          <input
+            type="text"
+            className="form-control"
+            id="searchInput"
+            placeholder="Search..."
+            ref={searchRef}
+          />
+          <div className="row mt-3">
+            <label className="form-label">Price:</label>
+            <div className="col-md-2 d-inline-block">
+              <input
+                type="text"
+                className="form-control"
+                placeholder="From"
+                ref={searchPriceFromRef}
+              />
+            </div>
+            <span className="search-form__price-delimiter">-</span>
+            <div className="col-md-2 d-inline-block">
+              <input
+                type="text"
+                className="form-control"
+                placeholder="To"
+                ref={searchPriceToRef}
+              />
+            </div>
+          </div>
+        </div>
+      </div>
       <div className="products">
         {products.map((product) => {
           return (
@@ -238,6 +338,18 @@ export default function Products({ cart, setCart }) {
                       ref={picturePathRef}
                     />
                     <label htmlFor="picturePathInput">Picture path</label>
+                  </div>
+                  <div className="form-floating mb-3">
+                    <input
+                      type="file"
+                      className="form-control form-control-sm form-file"
+                      id="fileInput"
+                      placeholder="Detailed description (PDF)"
+                      onChange={(e) => setSelectedFile(e.target.files[0])}
+                    />
+                    <label htmlFor="fileInput">
+                      Detailed description (PDF)
+                    </label>
                   </div>
                 </form>
               </div>

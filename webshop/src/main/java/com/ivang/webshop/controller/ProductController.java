@@ -4,6 +4,8 @@ import java.util.List;
 
 import com.ivang.webshop.dto.ProductDTO;
 import com.ivang.webshop.entity.Product;
+import com.ivang.webshop.lucene.model.shop.dto.ProductRequestDTO;
+import com.ivang.webshop.lucene.search.ProductRetriever;
 import com.ivang.webshop.service.ProductServiceInterface;
 
 import org.springframework.http.HttpStatus;
@@ -16,6 +18,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import lombok.RequiredArgsConstructor;
@@ -27,6 +30,17 @@ import lombok.RequiredArgsConstructor;
 public class ProductController {
     
     private final ProductServiceInterface productService;
+    private final ProductRetriever resultRetriever;
+
+    @GetMapping("/search/name/fuzzy")
+    public List<ProductRequestDTO> findProductsByNameFuzzy(@RequestParam(name = "name") String name) {
+        return resultRetriever.findProductsByNameFuzzy(name);
+    }
+
+    @GetMapping("/search/bool")
+    public List<ProductRequestDTO> findProductsBoolean(@RequestParam(name = "name") String name, @RequestParam(name = "text") String text, @RequestParam(name = "from") double from, @RequestParam(name = "to") double to, @RequestParam(name = "operation") String operation, @RequestParam(name = "fuzzy") boolean fuzzy) {
+        return resultRetriever.findBoolean(name, text, from, to, operation, fuzzy);
+    }
 
     @GetMapping
     public ResponseEntity<List<ProductDTO>> getAllProducts() {

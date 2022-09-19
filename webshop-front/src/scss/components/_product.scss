@@ -27,6 +27,16 @@
     }
   }
 
+  &__link {
+    display: block;
+    color: $blue-500;
+
+    &:hover {
+      cursor: pointer;
+      color: $blue-600;
+    }
+  }
+
   &__seller {
     margin-top: 3rem;
     margin-bottom: 2rem;

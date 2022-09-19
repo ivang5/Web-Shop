@@ -1,6 +1,7 @@
 package com.ivang.webshop.service;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.transaction.Transactional;
@@ -8,7 +9,9 @@ import javax.transaction.Transactional;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.ivang.webshop.dto.DetailedDescriptionDTO;
 import com.ivang.webshop.entity.DetailedDescription;
+import com.ivang.webshop.lucene.indexing.ProductIndexer;
 import com.ivang.webshop.repository.FileRepository;
 
 import lombok.RequiredArgsConstructor;
@@ -21,16 +24,24 @@ import lombok.extern.log4j.Log4j2;
 public class FileService implements FileServiceInterface {
 
     private final FileRepository fileRepository;
+    private final ProductIndexer productIndexer;
 
     @Override
     public DetailedDescription findOne(Long id) {
         log.info("Fetching file {}", id);
         return fileRepository.getById(id);
     }
+    
     @Override
-    public List<DetailedDescription> findAll() {
-        log.info("Fetching files");
-		return fileRepository.findAll();
+    public List<DetailedDescriptionDTO> findAll() {
+        log.info("Fetching all files");
+        List<DetailedDescriptionDTO> ddDTOs = new ArrayList<DetailedDescriptionDTO>();
+		
+        for(DetailedDescription dd : fileRepository.findAll()) {
+            ddDTOs.add(new DetailedDescriptionDTO(dd));
+        }
+
+        return ddDTOs;
     }
 
     @Override
@@ -41,7 +52,9 @@ public class FileService implements FileServiceInterface {
         dd.setType(file.getContentType());
         dd.setData(file.getBytes());
 
-        return fileRepository.save(dd);
+        DetailedDescription newDD = fileRepository.save(dd);
+        productIndexer.saveUploadedFileInFolder(file, newDD.getId());
+        return newDD;
     }
 
     @Override
