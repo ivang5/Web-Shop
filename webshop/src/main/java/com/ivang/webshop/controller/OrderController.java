@@ -4,6 +4,8 @@ import java.util.List;
 
 import com.ivang.webshop.dto.OrderDTO;
 import com.ivang.webshop.entity.Order;
+import com.ivang.webshop.lucene.model.shop.dto.OrderRequestDTO;
+import com.ivang.webshop.lucene.search.OrderRetriever;
 import com.ivang.webshop.service.OrderServiceInterface;
 
 import org.springframework.http.HttpStatus;
@@ -16,6 +18,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import lombok.RequiredArgsConstructor;
@@ -27,6 +30,12 @@ import lombok.RequiredArgsConstructor;
 public class OrderController {
     
     private final OrderServiceInterface orderService;
+    private final OrderRetriever resultRetriever;
+
+    @GetMapping("/search")
+    public List<OrderRequestDTO> findOrdersBoolean(@RequestParam(name = "comment") String comment, @RequestParam(name = "fromRate") int fromRate, @RequestParam(name = "toRate") int toRate, @RequestParam(name = "fromPrice") double fromPrice, @RequestParam(name = "toPrice") double toPrice, @RequestParam(name = "operation") String operation, @RequestParam(name = "fuzzy") boolean fuzzy) {
+        return resultRetriever.findBoolean(comment, fromRate, toRate, fromPrice, toPrice, operation, fuzzy);
+    }
 
     @GetMapping
     public ResponseEntity<List<OrderDTO>> getAllOrders() {

@@ -21,4 +21,10 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
 
     @Query(value = "SELECT p.name FROM products p JOIN items i ON p.id = i.product_id JOIN orders o ON i.order_id = o.id WHERE o.id = ?1", nativeQuery = true)
     List<String> getNamesByOrder(Long id);
+
+    @Query(value = "SELECT DISTINCT p.* FROM products p JOIN items i ON p.id = i.product_id JOIN orders o ON i.order_id = o.id WHERE ((SELECT AVG(ord.rate) FROM orders ord JOIN items itm ON ord.id = itm.order_id JOIN products prd ON itm.product_id = prd.id WHERE prd.id = p.id) BETWEEN ?1 AND ?2)", nativeQuery = true)
+    List<Product> findByAverageRate(int from, int to);
+
+    @Query(value= "SELECT DISTINCT p.* FROM products p JOIN items i ON p.id = i.product_id JOIN orders o ON i.order_id = o.id WHERE ((SELECT COUNT(ord.comment) FROM orders ord JOIN items itm ON ord.id = itm.order_id JOIN products prd ON itm.product_id = prd.id WHERE prd.id = p.id AND ord.comment IS NOT NULL) BETWEEN ?1 AND ?2)", nativeQuery = true)
+    List<Product> findByNumberOfComments(int from, int to);
 }

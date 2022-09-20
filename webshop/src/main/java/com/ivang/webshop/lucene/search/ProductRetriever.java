@@ -26,26 +26,8 @@ public class ProductRetriever {
 
 	private final ElasticsearchOperations elasticsearchOperations;
 
-    public List<ProductRequestDTO> findProductsByNameFuzzy(String name) {
-        log.info("Searching for products: {}", name);
-		QueryBuilder queryBuilder = SearchQueryGenerator.createFuzzyQueryBuilder(new SimpleQuery("name", name));
-
-		BoolQueryBuilder boolQueryName = QueryBuilders
-                .boolQuery()
-                .must(queryBuilder);
-
-		NativeSearchQuery searchQuery = new NativeSearchQueryBuilder()
-			.withQuery(boolQueryName)
-			.build();
-
-		SearchHits<ProductEs> productHits = elasticsearchOperations
-			.search(searchQuery, ProductEs.class, IndexCoordinates.of("products"));
-
-		return ProductRequestDTO.mapDtos(productHits);
-	}
-
     public List<ProductRequestDTO> findBoolean(String name, String text, double from, double to, String operation, boolean fuzzy) {
-        log.info("Searching for products with name: '{}', description: '{}' and price from {}$ to {}$", name, text, from, to);
+        log.info("Searching for products with name: '{}', description: '{}' and price from {} to {}", name, text, from, to);
         
         if (to == 0) {
             to = 1000000;

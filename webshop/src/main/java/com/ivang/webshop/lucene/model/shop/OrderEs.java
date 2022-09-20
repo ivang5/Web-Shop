@@ -20,7 +20,7 @@ import lombok.Setter;
 public class OrderEs {
     
     @Id
-    private String id;
+    private Long associatedId;
 
     @Field(type = FieldType.Date)
     private LocalDate time;
@@ -39,4 +39,7 @@ public class OrderEs {
     
     @Field(type = FieldType.Boolean)
     private boolean archivedComment = false;
+
+    @Field(type = FieldType.Double)
+    private double price;
 }

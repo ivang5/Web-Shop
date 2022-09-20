@@ -9,6 +9,8 @@ public interface ProductServiceInterface {
     
     public Product findOne(Long id);
     public List<ProductDTO> findAll();
+    public List<ProductDTO> findByAvgRate(int from, int to);
+    public List<ProductDTO> findByNumOfComments(int from, int to);
     public List<ProductDTO> findByActiveSellers();
     public List<ProductDTO> findBySeller(String username);
     public List<ProductDTO> findBySale(Long id);

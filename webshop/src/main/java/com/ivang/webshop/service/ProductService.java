@@ -49,6 +49,32 @@ public class ProductService implements ProductServiceInterface {
     }
 
     @Override
+    public List<ProductDTO> findByAvgRate(int from, int to) {
+        log.info("Fetching all products with average rating from {} to {}", from, to);
+
+        List<ProductDTO> productsDTO = new ArrayList<ProductDTO>();
+        
+        for(Product p : productRepository.findByAverageRate(from, to)) {
+            productsDTO.add(new ProductDTO(p));
+        }
+        
+        return productsDTO;
+    }
+
+    @Override
+    public List<ProductDTO> findByNumOfComments(int from, int to) {
+        log.info("Fetching all products with number of comments from {} to {}", from, to);
+
+        List<ProductDTO> productsDTO = new ArrayList<ProductDTO>();
+        
+        for(Product p : productRepository.findByNumberOfComments(from, to)) {
+            productsDTO.add(new ProductDTO(p));
+        }
+        
+        return productsDTO;
+    }
+
+    @Override
     public List<ProductDTO> findByActiveSellers() {
         log.info("Fetching all products");
         List<ProductDTO> productsDTO = new ArrayList<ProductDTO>();

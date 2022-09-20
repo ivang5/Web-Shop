@@ -40,6 +40,7 @@ export default function Cart({ cart, setCart }) {
       time: new Date(),
       delivered: false,
       buyer: buyer,
+      price: totalPrice,
     };
 
     await api("/shop/orders", {

@@ -20,8 +20,23 @@ public class OrderDTO implements Serializable {
     private boolean archivedComment = false;
     private BuyerDTO buyer;
     private List<ItemDTO> items = new ArrayList<ItemDTO>();
+    private double price;
 
     public OrderDTO() {}
+
+    public OrderDTO(Long id, Date time, boolean delivered, Integer rate, String comment, boolean anonymousComment,
+            boolean archivedComment, BuyerDTO buyer, List<ItemDTO> items, double price) {
+        this.id = id;
+        this.time = time;
+        this.delivered = delivered;
+        this.rate = rate;
+        this.comment = comment;
+        this.anonymousComment = anonymousComment;
+        this.archivedComment = archivedComment;
+        this.buyer = buyer;
+        this.items = items;
+        this.price = price;
+    }
 
     public OrderDTO(Long id, Date time, boolean delivered, Integer rate, String comment, boolean anonymousComment,
             boolean archivedComment, BuyerDTO buyer, List<ItemDTO> items) {
@@ -117,5 +132,13 @@ public class OrderDTO implements Serializable {
 
     public void setItems(List<ItemDTO> items) {
         this.items = items;
+    }
+
+    public double getPrice() {
+        return price;
+    }
+
+    public void setPrice(double price) {
+        this.price = price;
     }
 }

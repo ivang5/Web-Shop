@@ -32,12 +32,7 @@ public class ProductController {
     private final ProductServiceInterface productService;
     private final ProductRetriever resultRetriever;
 
-    @GetMapping("/search/name/fuzzy")
-    public List<ProductRequestDTO> findProductsByNameFuzzy(@RequestParam(name = "name") String name) {
-        return resultRetriever.findProductsByNameFuzzy(name);
-    }
-
-    @GetMapping("/search/bool")
+    @GetMapping("/search")
     public List<ProductRequestDTO> findProductsBoolean(@RequestParam(name = "name") String name, @RequestParam(name = "text") String text, @RequestParam(name = "from") double from, @RequestParam(name = "to") double to, @RequestParam(name = "operation") String operation, @RequestParam(name = "fuzzy") boolean fuzzy) {
         return resultRetriever.findBoolean(name, text, from, to, operation, fuzzy);
     }
@@ -45,6 +40,16 @@ public class ProductController {
     @GetMapping
     public ResponseEntity<List<ProductDTO>> getAllProducts() {
         return new ResponseEntity<List<ProductDTO>>(productService.findAll(), HttpStatus.OK);
+    }
+
+    @GetMapping(value = "/rate")
+    public ResponseEntity<List<ProductDTO>> getProductsWithAvgRate(@RequestParam(name = "from") int from, @RequestParam(name = "to") int to) {
+        return new ResponseEntity<List<ProductDTO>>(productService.findByAvgRate(from, to), HttpStatus.OK);
+    }
+
+    @GetMapping(value = "/comments")
+    public ResponseEntity<List<ProductDTO>> getProductsWithNumberOfComments(@RequestParam(name = "from") int from, @RequestParam(name = "to") int to) {
+        return new ResponseEntity<List<ProductDTO>>(productService.findByNumOfComments(from, to), HttpStatus.OK);
     }
 
     @GetMapping(value = "/active")
