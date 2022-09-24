@@ -30,7 +30,7 @@ public class ProductRetriever {
         log.info("Searching for products with name: '{}', description: '{}' and price from {} to {}", name, text, from, to);
         
         if (to == 0) {
-            to = 1000000;
+            to = 100000000;
         }
         
         String range = from + "-" + to;
@@ -55,11 +55,19 @@ public class ProductRetriever {
             if (!text.equals("")) {
                 boolQuery.must(descQuery);
             }
-            boolQuery.must(priceQuery);
+            if (to != 100000000 && from != 0) {
+                boolQuery.must(priceQuery);
+            }
         }else if(operation.equalsIgnoreCase("OR")){
-            boolQuery.should(nameQuery);
-            boolQuery.should(descQuery);
-            boolQuery.should(priceQuery);
+            if (!name.equals("")) {
+                boolQuery.should(nameQuery);
+            }
+            if (!name.equals("")) {
+                boolQuery.should(descQuery);
+            }
+            if (to != 100000000 && from != 0) {
+                boolQuery.should(priceQuery);
+            }
         }
 
         NativeSearchQuery searchQuery = new NativeSearchQueryBuilder()

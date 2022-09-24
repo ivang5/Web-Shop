@@ -4,6 +4,7 @@ import org.springframework.data.annotation.Id;
 import org.springframework.data.elasticsearch.annotations.Document;
 import org.springframework.data.elasticsearch.annotations.Field;
 import org.springframework.data.elasticsearch.annotations.FieldType;
+import org.springframework.data.elasticsearch.annotations.Setting;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -15,12 +16,13 @@ import lombok.Setter;
 @Getter
 @Setter
 @Document(indexName = "products")
+@Setting(settingPath = "/analyzers/serbianAnalyzer.json")
 public class ProductEs {
 
     @Id
     private Long associatedId;
 
-    @Field(type = FieldType.Keyword)
+    @Field(type = FieldType.Text)
     private String name;
 
     @Field(type = FieldType.Text)

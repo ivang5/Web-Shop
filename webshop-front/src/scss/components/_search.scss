@@ -4,6 +4,23 @@
 
   &__price-delimiter {
     width: fit-content;
-    padding: 5px 0;
+    padding: 5px 10px;
+  }
+
+  &__title {
+    cursor: pointer;
+
+    a {
+      text-decoration: none;
+
+      i {
+        padding-right: 0.4rem;
+      }
+    }
+  }
+
+  &__line {
+    color: $blue-600;
+    opacity: 0.5;
   }
 }

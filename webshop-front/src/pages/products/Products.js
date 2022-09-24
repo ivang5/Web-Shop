@@ -1,28 +1,40 @@
-import { Modal, Toast } from "bootstrap";
+import { Modal, Toast, Collapse } from "bootstrap";
 import React, { useEffect, useRef, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import { useAuth } from "../../contexts/AuthContext";
 import useFetch from "../../utils/useFetch";
-import { productTypeFormatter } from "../../utils/utils";
+import { currencyFormatter, productTypeFormatter } from "../../utils/utils";
 import Product from "./Product";
 
 export default function Products({ cart, setCart }) {
   const [products, setProducts] = useState([]);
   const [seller, setSeller] = useState({});
+  const [searchResults, setSearchResults] = useState([]);
+  const [esResults, setEsResults] = useState([]);
+  const [ratingResults, setRatingResults] = useState([]);
+  const [commentResults, setCommentResults] = useState([]);
+  const [showResults, setShowResults] = useState(false);
+  const [searching, setSearching] = useState(false);
   const nameRef = useRef();
   const descriptionRef = useRef();
   const priceRef = useRef();
   const productTypeRef = useRef();
   const picturePathRef = useRef();
-  const searchRef = useRef();
+  const searchNameRef = useRef();
   const searchPriceFromRef = useRef();
   const searchPriceToRef = useRef();
-  const searchByNameRef = useRef();
-  const searchByDescRef = useRef();
-  const searchByPriceRef = useRef();
+  const searchDescRef = useRef();
+  const searchAllRef = useRef();
+  const searchPhraseRef = useRef();
+  const searchFuzzyRef = useRef();
+  const searchRatingFromRef = useRef();
+  const searchRatingToRef = useRef();
+  const searchCommentsFromRef = useRef();
+  const searchCommentsToRef = useRef();
   const [selectedFile, setSelectedFile] = useState(null);
   const modal = useRef();
   const toast = useRef();
+  const collapse = useRef();
   const { user, getRole, authTokens } = useAuth();
   const { username } = useParams();
   const api = useFetch();
@@ -108,6 +120,147 @@ export default function Products({ cart, setCart }) {
     return await response.json();
   };
 
+  const search = async (e) => {
+    e.preventDefault();
+
+    setShowResults(true);
+    setSearching(true);
+
+    const rateFrom = getNumber(searchRatingFromRef.current.value);
+    const rateTo = getNumber(searchRatingToRef.current.value);
+    const commentsFrom = getNumber(searchCommentsFromRef.current.value);
+    const commentsTo = getNumber(searchCommentsToRef.current.value);
+
+    await getEsResults();
+    if (rateFrom != 0 || rateTo != 0) {
+      await getRatingResults(rateFrom, rateTo);
+    } else {
+      setRatingResults([]);
+    }
+
+    if (commentsFrom != 0 || commentsTo != 0) {
+      await getCommentResults(commentsFrom, commentsTo);
+    } else {
+      setCommentResults([]);
+    }
+
+    let commonResults = [];
+
+    if (esResults.length !== 0) {
+      commonResults = esResults.filter(
+        (value) => (value.id = value.associatedId)
+      );
+
+      if (rateFrom != 0 || rateTo != 0) {
+        commonResults = commonResults.filter((product) =>
+          ratingResults.some((item) => item.id === product.associatedId)
+        );
+      }
+
+      if (commentsFrom != 0 || commentsTo != 0) {
+        commonResults = commonResults.filter((product) =>
+          commentResults.some((item) => item.id === product.associatedId)
+        );
+      }
+    } else if (ratingResults.length !== 0) {
+      if (areAllInputsEmpty() || !searchAllRef.current.checked) {
+        commonResults = ratingResults;
+
+        if (commentsFrom != 0 || commentsTo != 0) {
+          commonResults = commonResults.filter((product) =>
+            commentResults.some((item) => item.id === product.id)
+          );
+        }
+      }
+    } else if (commentResults.length !== 0) {
+      if (areAllInputsEmpty() || !searchAllRef.current.checked) {
+        commonResults = commentResults;
+      }
+    }
+
+    setSearchResults(commonResults);
+    setSearching(false);
+  };
+
+  const getSearchObjEs = () => {
+    const nameToSearch =
+      searchPhraseRef.current.checked && searchNameRef.current.value !== ""
+        ? `"${searchNameRef.current.value}"`
+        : searchNameRef.current.value;
+
+    const descToSearch =
+      searchPhraseRef.current.checked && searchDescRef.current.value !== ""
+        ? `"${searchDescRef.current.value}"`
+        : searchDescRef.current.value;
+
+    const operation = searchAllRef.current.checked ? "AND" : "OR";
+
+    const searchObj = {
+      name: nameToSearch,
+      description: descToSearch,
+      priceFrom: getNumber(searchPriceFromRef.current.value),
+      priceTo: getNumber(searchPriceToRef.current.value),
+      matchAll: operation,
+      isFuzzy: searchFuzzyRef.current.checked,
+    };
+
+    return searchObj;
+  };
+
+  const getEsResults = async () => {
+    if (!areAllInputsEmpty()) {
+      const searchObjEs = getSearchObjEs();
+
+      const { response, data } = await api(
+        `/shop/products/search?name=${searchObjEs.name}&text=${searchObjEs.description}&from=${searchObjEs.priceFrom}&to=${searchObjEs.priceTo}&operation=${searchObjEs.matchAll}&fuzzy=${searchObjEs.isFuzzy}`
+      );
+
+      if (response.status === 200) {
+        setEsResults(data);
+      }
+    } else {
+      setEsResults([]);
+    }
+  };
+
+  const getRatingResults = async (rateFrom, rateTo) => {
+    const { response, data } = await api(
+      `/shop/products/rate?from=${rateFrom}&to=${rateTo}`
+    );
+
+    if (response.status === 200) {
+      setRatingResults(data);
+    }
+  };
+
+  const getCommentResults = async (commentsFrom, commentsTo) => {
+    const { response, data } = await api(
+      `/shop/products/comments?from=${commentsFrom}&to=${commentsTo}`
+    );
+
+    if (response.status === 200) {
+      setCommentResults(data);
+    }
+  };
+
+  const areAllInputsEmpty = () => {
+    if (
+      searchNameRef.current.value === "" &&
+      searchDescRef.current.value === "" &&
+      getNumber(searchPriceFromRef.current.value) === 0 &&
+      getNumber(searchPriceToRef.current.value) === 0
+    ) {
+      return true;
+    }
+
+    return false;
+  };
+
+  const getNumber = (value) => {
+    const retVal = value === "" ? 0 : value;
+    return retVal;
+  };
+
   const showModal = () => {
     const modalEle = modal.current;
     const bsModal = new Modal(modalEle, {
@@ -124,6 +277,15 @@ export default function Products({ cart, setCart }) {
       keyboard: false,
     });
     bsToast.show();
+  };
+
+  const toggleCollapse = () => {
+    const collapseEle = collapse.current;
+    const bsCollapse = new Collapse(collapseEle, {
+      backdrop: "static",
+      keyboard: false,
+    });
+    bsCollapse.toggle();
   };
 
   return (
@@ -147,73 +309,195 @@ export default function Products({ cart, setCart }) {
           </Link>
         </h1>
       )}
-      <div className="search-form mt-5 p-3">
-        <div className="mb-3">
-          <h5>Search</h5>
-          <div className="d-block">
-            <span className="d-inline-block">By:</span>
-            <div className="d-inline-block mb-3 mx-3 form-check">
-              <input
-                type="checkbox"
-                className="form-check-input"
-                id="nameCheck"
-                ref={searchByNameRef}
-              />
-              <label className="form-check-label" htmlFor="nameCheck">
-                Name
-              </label>
+      <div className="search-form mt-5 px-3 pt-2">
+        <form>
+          <h4
+            className="search-form__title"
+            aria-expanded="false"
+            onClick={toggleCollapse}
+          >
+            <a href="#">
+              <i className="bi bi-search"></i> Search for products
+            </a>
+          </h4>
+          <div className="collapse" ref={collapse}>
+            <div className="l-height-1"></div>
+            <div className="row">
+              <div className="col-md-7">
+                <label className="form-label">Name:</label>
+                <input
+                  type="text"
+                  className="form-control"
+                  id="searchInput"
+                  placeholder="Time machine..."
+                  ref={searchNameRef}
+                />
+              </div>
+              <div className="col-md-5">
+                <label className="form-label">Price:</label>
+                <div className="d-flex">
+                  <input
+                    type="number"
+                    className="form-control"
+                    placeholder="From"
+                    min={0}
+                    ref={searchPriceFromRef}
+                  />
+                  <span className="search-form__price-delimiter">-</span>
+                  <input
+                    type="number"
+                    className="form-control"
+                    placeholder="To"
+                    min={0}
+                    ref={searchPriceToRef}
+                  />
+                </div>
+              </div>
+              <div className="col-md-12 mt-3">
+                <label className="form-label">Description:</label>
+                <input
+                  type="text"
+                  className="form-control"
+                  id="searchInput"
+                  placeholder="With this machine, you can go back in time..."
+                  ref={searchDescRef}
+                />
+              </div>
             </div>
-            <div className="d-inline-block mb-3 form-check">
-              <input
-                type="checkbox"
-                className="form-check-input"
-                id="descCheck"
-                ref={searchByDescRef}
-              />
-              <label className="form-check-label" htmlFor="descCheck">
-                Description
-              </label>
+            <div className="d-block">
+              <div className="d-inline-block mt-3 mb-3 me-3 form-check">
+                <input
+                  type="checkbox"
+                  className="form-check-input"
+                  id="nameCheck"
+                  defaultChecked="true"
+                  ref={searchAllRef}
+                />
+                <label className="form-check-label" htmlFor="nameCheck">
+                  Satisfy all search inputs
+                </label>
+              </div>
+              <div className="d-inline-block mb-3 form-check">
+                <input
+                  type="checkbox"
+                  className="form-check-input"
+                  id="descCheck"
+                  ref={searchPhraseRef}
+                />
+                <label className="form-check-label" htmlFor="descCheck">
+                  Match whole text input
+                </label>
+              </div>
+              <div className="d-inline-block mb-3 mx-3 form-check">
+                <input
+                  type="checkbox"
+                  className="form-check-input"
+                  id="priceCheck"
+                  ref={searchFuzzyRef}
+                />
+                <label className="form-check-label" htmlFor="priceCheck">
+                  Allow small differences
+                </label>
+              </div>
             </div>
-            <div className="d-inline-block mb-3 mx-3 form-check">
-              <input
-                type="checkbox"
-                className="form-check-input"
-                id="priceCheck"
-                ref={searchByPriceRef}
-              />
-              <label className="form-check-label" htmlFor="priceCheck">
-                Price
-              </label>
+            <hr className="search-form__line" />
+            <h5>Filter results:</h5>
+            <div className="row mt-3">
+              <div className="col-md-6">
+                <label className="form-label">
+                  Products with average rating:
+                </label>
+                <div className="d-flex">
+                  <input
+                    type="number"
+                    className="form-control"
+                    placeholder="From"
+                    min={1}
+                    max={5}
+                    ref={searchRatingFromRef}
+                  />
+                  <span className="search-form__price-delimiter">-</span>
+                  <input
+                    type="number"
+                    className="form-control"
+                    placeholder="To"
+                    min={1}
+                    max={5}
+                    ref={searchRatingToRef}
+                  />
+                </div>
+              </div>
+              <div className="col-md-6">
+                <label className="form-label">
+                  Products with number of comments:
+                </label>
+                <div className="d-flex">
+                  <input
+                    type="number"
+                    className="form-control"
+                    placeholder="From"
+                    min={0}
+                    ref={searchCommentsFromRef}
+                  />
+                  <span className="search-form__price-delimiter">-</span>
+                  <input
+                    type="number"
+                    className="form-control"
+                    placeholder="To"
+                    min={0}
+                    ref={searchCommentsToRef}
+                  />
+                </div>
+              </div>
+            </div>
+            <button
+              type="submit"
+              className="btn btn-primary mt-3"
+              onClick={search}
+            >
+              <i className="bi bi-search"></i> Search
+            </button>
+            <div className="l-height-1"></div>
+            <div className={`search-form__results ${!showResults && "hidden"}`}>
+              <hr className="search-form__line" />
+              <h4>Results:</h4>
+              <div
+                className={`spinner-border text-primary ${
+                  !searching && "hidden"
+                }`}
+                role="status"
+              >
+                <span className="visually-hidden">Loading...</span>
+              </div>
+              <div className={searching && "hidden"}>
+                {searchResults.length === 0 ? (
+                  <p>Sorry, we couldn't find any results</p>
+                ) : (
+                  searchResults.map((product) => {
+                    return (
+                      <div
+                        key={product.id}
+                        className="search-form__results-item pb-1"
+                      >
+                        <h5 className="d-inline-block">
+                          <Link
+                            className="text-decoration-none"
+                            to={`/products/${product.id}`}
+                          >
+                            {product.name}
+                          </Link>
+                        </h5>
+                        <span className="ps-2 fw-bold fs-5">
+                          ({currencyFormatter.format(product.price)})
+                        </span>
+                      </div>
+                    );
+                  })
+                )}
+              </div>
             </div>
           </div>
-          <input
-            type="text"
-            className="form-control"
-            id="searchInput"
-            placeholder="Search..."
-            ref={searchRef}
-          />
-          <div className="row mt-3">
-            <label className="form-label">Price:</label>
-            <div className="col-md-2 d-inline-block">
-              <input
-                type="text"
-                className="form-control"
-                placeholder="From"
-                ref={searchPriceFromRef}
-              />
-            </div>
-            <span className="search-form__price-delimiter">-</span>
-            <div className="col-md-2 d-inline-block">
-              <input
-                type="text"
-                className="form-control"
-                placeholder="To"
-                ref={searchPriceToRef}
-              />
-            </div>
-          </div>
-        </div>
+        </form>
       </div>
       <div className="products">
         {products.map((product) => {

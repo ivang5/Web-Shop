@@ -21,7 +21,8 @@ export default function Product({
   const [inCart, setInCart] = useState(false);
   const [blocked, setBlocked] = useState(false);
   const [sale, setSale] = useState({});
-  const { user, getRole } = useAuth();
+  const [selectedFile, setSelectedFile] = useState(null);
+  const { user, getRole, authTokens } = useAuth();
   const { username } = useParams();
   const nameRef = useRef();
   const descriptionRef = useRef();
@@ -65,6 +66,20 @@ export default function Product({
   const changeProduct = async () => {
     const changedProduct = getChangedProduct();
 
+    if (selectedFile) {
+      const file = await uploadFile();
+      changedProduct.detailedDescription = file;
+      await pushProduct(changedProduct);
+    } else {
+      await pushProduct(changedProduct);
+    }
+
+    getProducts();
+    setToastMessage("Product successfully updated.");
+    showToast();
+  };
+
+  const pushProduct = async (changedProduct) => {
     await api("/shop/products", {
       method: "PUT",
       headers: {
@@ -72,10 +87,21 @@ export default function Product({
       },
       body: JSON.stringify(changedProduct),
     });
+  };
 
-    getProducts();
-    setToastMessage("Product successfully updated.");
-    showToast();
+  const uploadFile = async () => {
+    const formData = new FormData();
+    formData.append("file", selectedFile);
+
+    const response = await fetch(`http://localhost:8080/shop/files`, {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${authTokens.access_token}`,
+      },
+      body: formData,
+    });
+
+    return await response.json();
   };
 
   const removeProduct = async () => {
@@ -332,6 +358,18 @@ export default function Product({
                       defaultValue={picturePath}
                     />
                     <label htmlFor="picturePathInput">Picture path</label>
+                  </div>
+                  <div className="form-floating mb-3">
+                    <input
+                      type="file"
+                      className="form-control form-control-sm form-file"
+                      id="fileInput"
+                      placeholder="Detailed description (PDF)"
+                      onChange={(e) => setSelectedFile(e.target.files[0])}
+                    />
+                    <label htmlFor="fileInput">
+                      Detailed description (PDF)
+                    </label>
                   </div>
                 </form>
               </div>
