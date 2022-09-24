@@ -1,5 +1,6 @@
 import { Modal, Toast } from "bootstrap";
 import React, { useEffect, useRef, useState } from "react";
+import { Link } from "react-router-dom";
 import useFetch from "../../utils/useFetch";
 import { dateFormatter } from "../../utils/utils";
 
@@ -75,7 +76,11 @@ export default function Order({ order, getOrders }) {
   return (
     <>
       <tr>
-        <th scope="row">{order.id}</th>
+        <th scope="row">
+          <Link className="text-decoration-none" to={`/orders/${order.id}`}>
+            {order.id}
+          </Link>
+        </th>
         <td>{dateFormatter(order.time)}</td>
         <td>
           <div className="form-check" style={{ minHeight: "unset" }}>

@@ -1,6 +1,7 @@
 package com.ivang.webshop.service;
 
 import java.time.LocalDate;
+import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -115,7 +116,7 @@ public class OrderService implements OrderServiceInterface {
 
     private void populateOrder(Order order, OrderDTO orderDTO, OrderRequestDTO orderRequestDTO, boolean updating) {
         order.setTime(orderDTO.getTime());
-        orderRequestDTO.setTime(LocalDate.parse(orderDTO.getTime().toString()));
+        orderRequestDTO.setTime(orderDTO.getTime().toInstant().atZone(ZoneId.systemDefault()).toLocalDate());
         order.setDelivered(orderDTO.isDelivered());
         orderRequestDTO.setDelivered(orderDTO.isDelivered());
         order.setRate(orderDTO.getRate());

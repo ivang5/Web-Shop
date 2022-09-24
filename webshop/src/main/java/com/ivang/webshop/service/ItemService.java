@@ -45,6 +45,18 @@ public class ItemService implements ItemServiceInterface {
     }
 
     @Override
+    public List<ItemDTO> findAllByOrder(Long id) {
+        log.info("Fetching all items for order {}", id);
+        List<ItemDTO> itemsDTO = new ArrayList<ItemDTO>();
+
+		for(Item i : itemRepository.getByOrder(id)) {
+			itemsDTO.add(new ItemDTO(i));
+		}
+        
+		return itemsDTO;
+    }
+
+    @Override
     public void save(ItemDTO itemDTO) {
         log.info("Saving new item {} to the database", itemDTO.getId());
         Item item = new Item();

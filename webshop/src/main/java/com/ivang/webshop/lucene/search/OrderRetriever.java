@@ -30,11 +30,11 @@ public class OrderRetriever {
         log.info("Searching for orders with comment: '{}', rate from: {} to {} and price from {} to {}", comment, fromRate, toRate, fromPrice, toPrice);
         
         if (toRate == 0) {
-            toRate = 5;
+            toRate = 100000000;
         }
 
         if (toPrice == 0) {
-            toPrice = 1000000;
+            toPrice = 100000000;
         }
         
         String rangeRate = fromRate + "-" + toRate;
@@ -55,12 +55,22 @@ public class OrderRetriever {
             if (!comment.equals("")) {
                 boolQuery.must(commentQuery);
             }
-            boolQuery.must(rateQuery);
-            boolQuery.must(priceQuery);
+            if (toRate != 100000000 && fromRate != 0) {
+                boolQuery.must(rateQuery);
+            }
+            if (toRate != 100000000 && fromRate != 0) {
+                boolQuery.must(priceQuery);
+            }
         }else if(operation.equalsIgnoreCase("OR")){
-            boolQuery.should(commentQuery);
-            boolQuery.should(rateQuery);
-            boolQuery.should(priceQuery);
+            if (!comment.equals("")) {
+                boolQuery.should(commentQuery);
+            }
+            if (toRate != 100000000 && fromRate != 0) {
+                boolQuery.should(rateQuery);
+            }
+            if (toRate != 100000000 && fromRate != 0) {
+                boolQuery.should(priceQuery);
+            }
         }
 
         NativeSearchQuery searchQuery = new NativeSearchQueryBuilder()

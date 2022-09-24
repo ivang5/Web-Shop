@@ -33,6 +33,11 @@ public class ItemController {
         return new ResponseEntity<List<ItemDTO>>(itemService.findAll(), HttpStatus.OK);
     }
 
+    @GetMapping(value = "/order/{id}")
+    public ResponseEntity<List<ItemDTO>> getItemsByOrder(@PathVariable("id") Long id) {
+        return new ResponseEntity<List<ItemDTO>>(itemService.findAllByOrder(id), HttpStatus.OK);
+    }
+
     @GetMapping(value = "/{id}")
     public ResponseEntity<ItemDTO> getItemById(@PathVariable("id") Long id) {
 		Item item = itemService.findOne(id);

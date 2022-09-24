@@ -49,6 +49,10 @@ export default function Products({ cart, setCart }) {
     }
   }, []);
 
+  useEffect(() => {
+    getSearchResults();
+  }, [esResults, ratingResults, commentResults]);
+
   const getProducts = async () => {
     let reply = { response: {}, data: {} };
 
@@ -132,6 +136,7 @@ export default function Products({ cart, setCart }) {
     const commentsTo = getNumber(searchCommentsToRef.current.value);
 
     await getEsResults();
+
     if (rateFrom != 0 || rateTo != 0) {
       await getRatingResults(rateFrom, rateTo);
     } else {
@@ -143,7 +148,13 @@ export default function Products({ cart, setCart }) {
     } else {
       setCommentResults([]);
     }
+  };
 
+  const getSearchResults = () => {
+    const rateFrom = getNumber(searchRatingFromRef.current.value);
+    const rateTo = getNumber(searchRatingToRef.current.value);
+    const commentsFrom = getNumber(searchCommentsFromRef.current.value);
+    const commentsTo = getNumber(searchCommentsToRef.current.value);
     let commonResults = [];
 
     if (esResults.length !== 0) {
@@ -224,6 +235,8 @@ export default function Products({ cart, setCart }) {
   };
 
   const getRatingResults = async (rateFrom, rateTo) => {
+    rateTo = rateTo == 0 ? 5 : rateTo;
+
     const { response, data } = await api(
       `/shop/products/rate?from=${rateFrom}&to=${rateTo}`
     );
@@ -234,6 +247,8 @@ export default function Products({ cart, setCart }) {
   };
 
   const getCommentResults = async (commentsFrom, commentsTo) => {
+    commentsTo = commentsTo == 0 ? 100000000 : commentsTo;
+
     const { response, data } = await api(
       `/shop/products/comments?from=${commentsFrom}&to=${commentsTo}`
     );
@@ -259,6 +274,18 @@ export default function Products({ cart, setCart }) {
   const getNumber = (value) => {
     const retVal = value === "" ? 0 : value;
     return retVal;
+  };
+
+  const handlePhraseCbChange = () => {
+    if (searchPhraseRef.current.checked && searchFuzzyRef.current.checked) {
+      searchFuzzyRef.current.checked = !searchFuzzyRef.current.checked;
+    }
+  };
+
+  const handleFuzzyCbChange = () => {
+    if (searchFuzzyRef.current.checked && searchPhraseRef.current.checked) {
+      searchPhraseRef.current.checked = !searchPhraseRef.current.checked;
+    }
   };
 
   const showModal = () => {
@@ -383,6 +410,7 @@ export default function Products({ cart, setCart }) {
                   className="form-check-input"
                   id="descCheck"
                   ref={searchPhraseRef}
+                  onChange={handlePhraseCbChange}
                 />
                 <label className="form-check-label" htmlFor="descCheck">
                   Match whole text input
@@ -394,6 +422,7 @@ export default function Products({ cart, setCart }) {
                   className="form-check-input"
                   id="priceCheck"
                   ref={searchFuzzyRef}
+                  onChange={handleFuzzyCbChange}
                 />
                 <label className="form-check-label" htmlFor="priceCheck">
                   Allow small differences

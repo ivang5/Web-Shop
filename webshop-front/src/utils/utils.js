@@ -10,6 +10,10 @@ export const dateFormatter = (date) => {
   return dayjs(date).format("DD/MM/YYYY");
 };
 
+export const dateTimeFormatter = (date) => {
+  return dayjs(date).format("DD/MM/YYYY - HH:mm:ss");
+};
+
 export const listFormatter = (list) => {
   let newList = [];
   let firstItem = true;

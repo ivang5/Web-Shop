@@ -12,6 +12,7 @@ import User from "./pages/users/User";
 import Sellers from "./pages/sellers/Sellers";
 import SellerDetails from "./pages/sellers/SellerDetails";
 import Orders from "./pages/orders/Orders";
+import OrderDetails from "./pages/orders/OrderDetails";
 import Cart from "./pages/cart/Cart";
 import Footer from "./components/Footer";
 import { useState } from "react";
@@ -82,6 +83,13 @@ function App() {
             </Route>
             <Route exact path="/orders" element={<PrivateRoute />}>
               <Route exact path="/orders" element={<Orders />}></Route>
+            </Route>
+            <Route exact path="/orders/:id" element={<PrivateRoute />}>
+              <Route
+                exact
+                path="/orders/:id"
+                element={<OrderDetails />}
+              ></Route>
             </Route>
             <Route exact path="/cart" element={<PrivateRoute />}>
               <Route

@@ -43,6 +43,8 @@ export default function Cart({ cart, setCart }) {
       price: totalPrice,
     };
 
+    console.log(newOrder);
+
     await api("/shop/orders", {
       method: "POST",
       headers: {
