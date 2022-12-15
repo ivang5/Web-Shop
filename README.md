@@ -4,8 +4,8 @@ Web shop application built with spring framework for backend, react for frontend
 
 ### Running the app:
 
-- Backend: Run WebshopApplication.java file
-- Frontend: Navigate to webshop-front directory and run "npm start"
+- Backend: Run `WebshopApplication.java` file
+- Frontend: Navigate to webshop-front directory and execute `npm start`
 - Search engine: Start elasticsearch server
 - Open browser and go to: http://localhost:3000/
 
